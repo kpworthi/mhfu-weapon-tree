@@ -1,0 +1,193 @@
+@media (min-width: 768px) and (max-width: 991px) {
+  #zoomInBtn { right: calc(33% + 72px)!important; }
+  #zoomOutBtn { right: calc(33% + 30px)!important; }
+}
+@media (max-width: 767px) {
+  :root {
+    font-size: 14px;
+  }
+  .sub-heading {
+    display: none;
+  }
+  /*
+  #intro {
+    height: 50px!important;
+  }
+  */
+  #tooltip {
+    display: none;
+  }
+  #svg-overflow-wrapper{
+    height: calc((100vh - 150px) / 2)!important; 
+  }
+  #info-panel{
+    height: calc((100vh - 150px) / 2)!important;
+  }
+  #zoomInBtn { right: 72px!important; }
+  #zoomOutBtn { right: 30px!important; }
+}
+
+body {
+  height: 100vh;
+  overflow: hidden;
+  background-color: rgb(183, 232, 226);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: steelblue #92b6d5;
+}
+
+*::-webkit-scrollbar {
+  width: 12px;
+}
+
+*::-webkit-scrollbar-track {
+  background: #92b6d5;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: steelblue;
+  border-radius: 20px;
+  border: 3px solid #92b6d5;
+}
+
+#title-bar{
+  height: 100px;
+  margin-top: 10px;
+  background-color: lightcyan;
+}
+
+.sub-heading {
+  font-style: italic;
+}
+
+.title {
+  font-family: 'Reggae One', cursive;
+}
+
+#main-app-row {
+  position: relative;
+}
+
+#svg-overflow-wrapper {
+  user-select: none;
+  height: calc(100vh - 125px);
+  overflow: auto;
+  border: 1px solid black;
+  background-color: rgb(183, 232, 226);
+  background-image: linear-gradient(rgba(183, 232, 226, 0.95), rgba(183, 232, 226, 0.95)),
+                    url('./icons/sns.png')
+}
+
+/* Tree Definitions */
+
+#zoomInBtn, #zoomOutBtn {
+  user-select: none;
+  position: absolute;
+  z-index: 20;
+  border: 1px solid black;
+  border-radius: 10px;
+  text-align: center;
+  background-color: white;
+  cursor: pointer;
+  top: 10px;
+  width: 32px;
+  height: 32px;
+}
+
+#zoomInBtn { right: calc(25% + 72px); }
+#zoomOutBtn { right: calc(25% + 30px); }
+/*
+.icon, .h-line, .v-line, text, svg {
+  transition: width 0.5s, height 0.5s, x 0.5s, y 0.5s;
+}
+element zoom transitions disabled for now*/
+
+.zoom {
+  transition: stroke 0.5s, stroke-width 0.5s, width 0.5s, height 0.5s, x 0.5s, y 0.5s !important;
+}
+
+.icon-border {
+  stroke: black;
+  stroke-width: 1;
+  transition: stroke 0.5s, stroke-width 0.5s/*, width 0.5s, height 0.5s, x 0.5s, y 0.5s;*/
+}
+
+#tooltip {
+  padding: 5px;
+  background-color: white;
+  border: 1px solid black;
+  border-radius: 5px;
+  pointer-events: none;
+}
+
+.compare { display: none; }
+.show { display: table-cell; }
+
+
+.tree-title-closed, .tree-title-open {
+  cursor: pointer;
+}
+
+.tree-title-closed { font-style: italic; }
+.tree-title-open { font-weight: bold; }
+
+.active-border {
+  stroke: yellow;
+  stroke-width: 2;
+  animation: 3s linear infinite alternate border-animation;
+}
+
+@keyframes border-animation {
+  0%   { stroke: yellow }
+  25%   { stroke: yellow }
+  50% { stroke: black }
+  75%   { stroke: yellow }
+  100% { stroke: yellow }
+}
+
+/* Panel Definitions */
+
+#info-panel {
+  height: calc(100vh - 125px);
+  overflow-y: auto;
+  background-color: lightcyan;
+  border: 1px solid black;
+}
+
+#info-panel > table {
+  width: 100%;
+  padding-bottom: 1000px;
+}
+
+#info-panel td {
+  width: 50%;
+  border: 1px solid black
+}
+
+.cell-type-unavail {
+  width: 100%;
+  border: 1px solid black;
+}
+
+/* Sharpness Classes */
+
+.sharp-bar {
+  display: inline-block;
+  height: 10px;
+  border: 1px solid black;
+}
+
+.red { background-color: red; }
+.ora { background-color: orange; }
+.yel { background-color: yellow; }
+.gre { background-color: green; }
+.blu { background-color: blue; }
+.whi { background-color: white; }
+
+.n { width: 0px; }
+.t { width: 5px; }
+.s { width: 10px; }
+.m { width: 15px; }
+.b { width: 20px; }
