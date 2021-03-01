@@ -1,10 +1,14 @@
 import snsData from './sns-data.js';
 import snsMap from './sns-map.js';
+import NavBar from './navbar.js';
 
 class Main extends React.Component {
   constructor() {
     super();
     this.state = {
+      appTitle: "weapons",
+      subTitle: "sword and shield",
+      tagLine: "Hey, piece of shiny!",
       zoom: 32,
       oldZoom: 32,
       itemSelect: "",
@@ -17,12 +21,17 @@ class Main extends React.Component {
     this.dragX = 0;
     this.dragY = 0;
     this.sharpColors = ["red", "ora", "yel", "gre", "blu", "whi"];
+
+    this.changeState = stateObj => {
+      this.setState(stateObj);
+    };
+
     this.displayTree = this.displayTree.bind(this);
     this.buildPanelSharpness = this.buildPanelSharpness.bind(this);
     this.buttonHandler = this.buttonHandler.bind(this);
     this.dragHandler = this.dragHandler.bind(this);
-    this.keyHandler = this.keyHandler.bind(this);
     this.hoverHandler = this.hoverHandler.bind(this);
+    this.keyHandler = this.keyHandler.bind(this);
     this.tooltipInfo = this.tooltipInfo.bind(this);
   }
 
@@ -423,28 +432,23 @@ class Main extends React.Component {
     })))), /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("td", null), /*#__PURE__*/React.createElement("td", {
       id: "compare-sharp"
     }, compare && selected ? this.buildPanelSharpness() : null))));
-    /*
-        <article id="intro" class="text-center">
-          <p>Here you'll find horizontal trees for most of the sword-and-shield-type weapons in MHFU.</p>
-        </article>
-        */
   }
 
   render() {
     let selectedWeapon = this.state.itemSelect;
+    let title = this.state.appTitle;
+    let subTitle = this.state.subTitle;
     return /*#__PURE__*/React.createElement("div", {
       id: "app-wrapper",
       class: "container-fluid d-flex flex-column"
-    }, /*#__PURE__*/React.createElement("div", {
-      id: "title-bar",
-      class: "border border-dark text-center mb-2"
-    }, /*#__PURE__*/React.createElement("h1", {
-      class: "title"
-    }, "Sword and Shield Crafting Tree"), /*#__PURE__*/React.createElement("p", {
-      class: "h3 sub-heading"
-    }, "Hey, piece of shiny!")), /*#__PURE__*/React.createElement("div", {
+    }, /*#__PURE__*/React.createElement(NavBar, {
+      title: this.state.appTitle,
+      subTitle: this.state.subTitle,
+      tagLine: this.state.tagLine,
+      changeState: this.changeState
+    }), /*#__PURE__*/React.createElement("div", {
       id: "main-app-row",
-      class: "row m-0 "
+      class: "row m-0"
     }, /*#__PURE__*/React.createElement("div", {
       id: "zoomInBtn",
       onClick: this.buttonHandler
@@ -453,14 +457,14 @@ class Main extends React.Component {
       onClick: this.buttonHandler
     }, "-"), /*#__PURE__*/React.createElement("div", {
       id: "svg-overflow-wrapper",
-      class: "col-md-8 col-lg-9",
+      class: "col-sm-8 col-lg-9",
       onMouseLeave: this.dragHandler,
       onMouseDown: this.dragHandler,
       onMouseUp: this.dragHandler,
       onMouseMove: this.dragHandler
     }, this.displayTree()), /*#__PURE__*/React.createElement("div", {
       id: "info-panel",
-      class: "pt-1 pb-3 col-md-4 col-lg-3"
+      class: "pt-1 pb-3 col-sm-4 col-lg-3"
     }, /*#__PURE__*/React.createElement("h2", {
       class: "title"
     }, "Info Panel"), selectedWeapon === "" ? null : /*#__PURE__*/React.createElement("table", {

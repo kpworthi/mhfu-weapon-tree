@@ -1,11 +1,16 @@
 import snsData from './sns-data.js';
 import snsMap from './sns-map.js';
+import NavBar from './navbar.js';
 
 class Main extends React.Component {
   constructor() {
     super();
 
-    this.state = { zoom: 32,
+    this.state = { 
+                   appTitle: "weapons",
+                   subTitle: "sword and shield",
+                   tagLine: "Hey, piece of shiny!",
+                   zoom: 32,
                    oldZoom: 32,
                    itemSelect: "",
                    collapsedTrees: [],
@@ -19,12 +24,14 @@ class Main extends React.Component {
     this.dragY = 0;
     this.sharpColors = ["red", "ora", "yel", "gre", "blu", "whi"];
 
+    this.changeState = ( stateObj ) => { this.setState(stateObj) }
+
     this.displayTree   = this.displayTree.bind(this);
     this.buildPanelSharpness = this.buildPanelSharpness.bind(this);
     this.buttonHandler = this.buttonHandler.bind(this);
     this.dragHandler   = this.dragHandler.bind(this);
-    this.keyHandler    = this.keyHandler.bind(this);
     this.hoverHandler  = this.hoverHandler.bind(this);
+    this.keyHandler    = this.keyHandler.bind(this);
     this.tooltipInfo   = this.tooltipInfo.bind(this);
   }
 
@@ -421,33 +428,27 @@ class Main extends React.Component {
         </tbody>
       </table>
     )
-    /*
-        <article id="intro" class="text-center">
-          <p>Here you'll find horizontal trees for most of the sword-and-shield-type weapons in MHFU.</p>
-        </article>
-        */
   }
 
   render () {
     let selectedWeapon = this.state.itemSelect;
+    let title = this.state.appTitle;
+    let subTitle = this.state.subTitle;
     return(
       <div id="app-wrapper" class="container-fluid d-flex flex-column" >
-        <div id="title-bar" class="border border-dark text-center mb-2">
-          <h1 class="title">Sword and Shield Crafting Tree</h1>
-          <p class="h3 sub-heading">Hey, piece of shiny!</p>
-        </div>
-        <div id="main-app-row" class="row m-0 ">
+        <NavBar title={this.state.appTitle} subTitle={this.state.subTitle} tagLine={this.state.tagLine} changeState={this.changeState}/>
+        <div id="main-app-row" class="row m-0">
           <div id="zoomInBtn" onClick={this.buttonHandler}>+</div>
           <div id="zoomOutBtn" onClick={this.buttonHandler}>-</div>
           <div id="svg-overflow-wrapper" 
-               class="col-md-8 col-lg-9"
+               class="col-sm-8 col-lg-9"
                onMouseLeave={this.dragHandler}
                onMouseDown={this.dragHandler}
                onMouseUp={this.dragHandler}
                onMouseMove={this.dragHandler}>
             {this.displayTree()}
           </div>
-          <div id="info-panel" class="pt-1 pb-3 col-md-4 col-lg-3">
+          <div id="info-panel" class="pt-1 pb-3 col-sm-4 col-lg-3">
             <h2 class="title">Info Panel</h2>
             {selectedWeapon===""?null:(
             <table id="panel-main-table" class="panel-main-table ml-2">

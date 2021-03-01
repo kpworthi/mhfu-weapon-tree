@@ -1,20 +1,18 @@
 {
   "name": "mhfu-weapon-trees",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "KPWorthi personal project, MHFU Weapon Tree Display",
   "main": "server.js",
   "scripts": {
     "babel": "babel src -d public",
+    "babelwatch": "babel src --watch -d public",
     "sass": "sass src:public",
     "build": "npm run babel && npm run sass",
     "start": "nodemon server.js"
   },
   "dependencies": {
-    "@babel/cli": "^7.13.0",
-    "@babel/core": "^7.13.1",
     "@babel/preset-env": "^7.12.7",
     "@babel/preset-react": "^7.12.7",
-    "@babel/register": "^7.12.1",
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
@@ -23,5 +21,9 @@
     "nodemon": "^2.0.7"
   },
   "license": "MIT",
-  "devDependencies": {}
+  "devDependencies": {
+    "@babel/cli": "^7.13.0",
+    "@babel/core": "^7.13.8",
+    "@babel/register": "^7.13.8"
+  }
 }
