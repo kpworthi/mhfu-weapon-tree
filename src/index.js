@@ -58,11 +58,14 @@ class Main extends React.Component {
         document.querySelectorAll('.active-border').forEach( border => border.classList.remove('active-border') );
       if ( this.state.itemSelect && this.state.itemSelect.type == this.dataAndMaps[this.state.subTitle][2] ){
         // do border update only if there wasn't a manual tree switch  
-        if ( this.state.itemSelect && this.state.itemSelectBorder )
-          document.getElementById(this.state.itemSelectBorder).classList.add('active-border')
+        if ( this.state.itemSelect && document.getElementById(this.state.itemSelectBorder)   ){
+          let newBorder = document.getElementById(this.state.itemSelectBorder);
+          if ( newBorder.dataset.weapon === this.state.itemSelect.name ) newBorder.classList.add('active-border')
+        }
         else {
           let borders = Array.from(document.querySelectorAll('.icon-border'));
-          borders.find( border => border.dataset.weapon.startsWith(this.state.itemSelect.name) ).classList.add('active-border');
+          let newBorder = borders.find( border => border.dataset.weapon.startsWith(this.state.itemSelect.name) );
+          if ( newBorder ) newBorder.classList.add('active-border');
         }
       }
     }
