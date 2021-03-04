@@ -8,17 +8,22 @@ The potential upgrade routes are not known to the player past any current weapon
 collect that information and present it in a way I'm more excited about, and hopefully others are too.
 
 ## how
-A web scraper was built using python to collect data from fan-made 'wiki' pages. Additional python was used to then organize the data into a grid in array/list format and then converted to a json string. Only mild manual changes were made to the collected data to account
-for minor human errors found in the original data.
+A web scraper was built using python to collect data from fan-made 'wiki' pages. Additional python was used to then organize the data into a grid in array/list 
+format and then converted to a json string. Only mild manual changes were made to the collected data to account for minor human errors found in the original data.
 
-The json strings for both the grid and the originally scraped data is then served to the client-side JavaScript application and line, icon, and border positions are all calculated prior to placement of the elements into an SVG field. State refreshes are performed through React and Bootstrap JS/CSS is used for overall layout
+The json strings for both the grid and the originally scraped data is then served to the client-side JavaScript application and line, icon, and border positions 
+are all calculated prior to placement of the elements into an SVG field. State refreshes are performed through React and Bootstrap JS/CSS is used for overall layout
 assistance.
 
 ## what
 The user selects a weapon type and the respective trees will be shown. By **clicking on the main tree names** on the left-side of the view, the player can minimize
 that tree. By **hovering over any weapon icon**, a 'tool-tip' will be shown with minimal information on that weapon (desktop only). **Clicking on the icon**
 will select that weapon and display additional information in the right-hand information panel (bottom of the screen for small devices). 
-**Hovering and holding control** will compare the hovered weapon to a currently selected weapon (desktop only).
+**Hovering and holding control** will compare the hovered weapon to a currently selected weapon (desktop only). If a weapon in the tree is of a different type,
+**clicking that weapon icon** will take you to its place in the other tree.
 
 Users can **click the zoom buttons** in the top-right of the tree display area to zoom the tree in or out. When a user 
 **clicks and drags** the main tree display area, the tree area will pan.
+
+**Clicking the list button** will change the view to a list view. **Clicking the list headers** will sort by that header and **clicking again** will reverse the sort
+order. Any row with a weapon also listed in the tree will have a **tree link button** in the last column that will take you to that weapon's spot in the tree.
