@@ -28,7 +28,7 @@ class Main extends React.Component {
     this.ctrlState = false;
     this.dragX = 0;
     this.dragY = 0;
-    this.sharpColors = ["red", "ora", "yel", "gre", "blu", "whi"];
+    this.sharpColors = ["red", "ora", "yel", "gre", "blu", "whi", "pur"];
 
     this.dataAndMaps = { 'sword and shield': [snsData, snsMap, 'sns'], 'dual blades': [dbData, dbMap, 'db']}
     this.weaponAlts  = { 'sword and shield': ['Dual Blades', 'db'], 'dual blades': ['Sword and Shield', 'sns'] }
@@ -577,32 +577,15 @@ class Main extends React.Component {
     }
     return (
       <div class="sharp-container">
-        {sharpness.map( str => {
+        {sharpness.map( (str, ind) => {
           return (
-            <div class={`sharp-bar ${str[0].toLowerCase()} ${str.slice(1)}`}/>
+            <div class={`sharp-bar ${str[0].toLowerCase()} ${str.slice(1)} ${ind>0&&sharpness[ind-1].slice(-3)===str.slice(-3)?'sh-dbl':null}`}/>
           )}
         )}
       </div>
     )
   }
 
-  buildToolSharpness (sharpString) {
-    let colors = this.sharpColors;
-    let sharpness = [];
-    for (let i=0; i<sharpString.length; i+=4) {
-      sharpness.push(sharpString.slice(i,i+4));
-    }
-    for (let each of colors) {
-      let tag = sharpness.find( val => each === val.slice(1))
-      if ( tag === undefined ){
-        document.querySelector(`#tool-${each}-bar`).className = `n`;
-      }
-      else {
-        document.querySelector(`#tool-${each}-bar`).className = `sharp-bar ${each} ${tag[0].toLowerCase()}`;
-      }
-    }
-  }
-  
   hoverHandler ( event ) {
     let tooltip = document.querySelector("#tooltip");
     let htmlEl = document.querySelector("html");

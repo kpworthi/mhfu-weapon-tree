@@ -328,3 +328,5 @@ body {
 .s { width: 10px; }
 .m { width: 15px; }
 .b { width: 20px; }
+
+.sh-dbl { border-left: 0px!important; }

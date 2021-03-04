@@ -26,7 +26,7 @@ class Main extends React.Component {
     this.ctrlState = false;
     this.dragX = 0;
     this.dragY = 0;
-    this.sharpColors = ["red", "ora", "yel", "gre", "blu", "whi"];
+    this.sharpColors = ["red", "ora", "yel", "gre", "blu", "whi", "pur"];
     this.dataAndMaps = {
       'sword and shield': [snsData, snsMap, 'sns'],
       'dual blades': [dbData, dbMap, 'db']
@@ -629,30 +629,11 @@ class Main extends React.Component {
 
     return /*#__PURE__*/React.createElement("div", {
       class: "sharp-container"
-    }, sharpness.map(str => {
+    }, sharpness.map((str, ind) => {
       return /*#__PURE__*/React.createElement("div", {
-        class: `sharp-bar ${str[0].toLowerCase()} ${str.slice(1)}`
+        class: `sharp-bar ${str[0].toLowerCase()} ${str.slice(1)} ${ind > 0 && sharpness[ind - 1].slice(-3) === str.slice(-3) ? 'sh-dbl' : null}`
       });
     }));
-  }
-
-  buildToolSharpness(sharpString) {
-    let colors = this.sharpColors;
-    let sharpness = [];
-
-    for (let i = 0; i < sharpString.length; i += 4) {
-      sharpness.push(sharpString.slice(i, i + 4));
-    }
-
-    for (let each of colors) {
-      let tag = sharpness.find(val => each === val.slice(1));
-
-      if (tag === undefined) {
-        document.querySelector(`#tool-${each}-bar`).className = `n`;
-      } else {
-        document.querySelector(`#tool-${each}-bar`).className = `sharp-bar ${each} ${tag[0].toLowerCase()}`;
-      }
-    }
   }
 
   hoverHandler(event) {
