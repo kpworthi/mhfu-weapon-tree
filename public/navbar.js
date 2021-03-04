@@ -8,7 +8,7 @@ const NavBar = ({
     weapons: {
       title: "Weapons",
       location: "https://trees.nyralen.com",
-      subs: ["Sword and Shield", "Dual Swords"]
+      subs: ["Sword and Shield", "Dual Blades"]
     },
     kitchen: {
       title: "Kitchen",

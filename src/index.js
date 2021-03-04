@@ -1,7 +1,7 @@
 import snsData from './sns-data.js';
 import snsMap from './sns-map.js';
-import dsData from './ds-data.js';
-import dsMap from './ds-map.js';
+import dbData from './db-data.js';
+import dbMap from './db-map.js';
 import NavBar from './navbar.js';
 
 class Main extends React.Component {
@@ -30,9 +30,9 @@ class Main extends React.Component {
     this.dragY = 0;
     this.sharpColors = ["red", "ora", "yel", "gre", "blu", "whi"];
 
-    this.dataAndMaps = { 'sword and shield': [snsData, snsMap, 'sns'], 'dual swords': [dsData, dsMap, 'ds']}
-    this.weaponAlts  = { 'sword and shield': ['Dual Swords', 'ds'], 'dual swords': ['Sword and Shield', 'sns'] }
-    this.abbr        = { 'sword and shield': ['sns', 'ds'], 'dual swords': ['ds', 'sns']}
+    this.dataAndMaps = { 'sword and shield': [snsData, snsMap, 'sns'], 'dual blades': [dbData, dbMap, 'db']}
+    this.weaponAlts  = { 'sword and shield': ['Dual Blades', 'db'], 'dual blades': ['Sword and Shield', 'sns'] }
+    this.abbr        = { 'sword and shield': ['sns', 'db'], 'dual blades': ['db', 'sns']}
 
     this.changeState = ( stateObj ) => { this.setState(stateObj) }
 

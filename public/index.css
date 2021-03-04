@@ -305,10 +305,14 @@ body {
   min-width: max-content;
 }
 
+.sharp-container div:last-child { border-right: 1px solid black; }
+
 .sharp-bar {
   display: inline-block;
   height: 10px;
-  border: 1px solid black;
+  border-top: 1px solid black;
+  border-bottom: 1px solid black;
+  border-left: 1px solid black;
 }
 
 .red { background-color: red; }
@@ -317,6 +321,7 @@ body {
 .gre { background-color: green; }
 .blu { background-color: blue; }
 .whi { background-color: white; }
+.pur { background-color: purple;}
 
 .n { width: 0px; }
 .t { width: 5px; }
