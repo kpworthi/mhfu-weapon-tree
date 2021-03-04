@@ -101,7 +101,7 @@ class Main extends React.Component {
       } else if (sortKey == "bonus") {
         valueA = Number(valueA.slice(1)) || 0;
         valueB = Number(valueB.slice(1)) || 0;
-      } else if (sortKey == "attribute") {
+      } else if (sortKey == "element") {
         valueA = valueA === "n/a" ? "a" : valueA;
         valueB = valueB === "n/a" ? "a" : valueB;
       }
@@ -124,7 +124,7 @@ class Main extends React.Component {
       class: "list-header"
     }, "Attack"), /*#__PURE__*/React.createElement("td", {
       class: "list-header"
-    }, "Attribute"), /*#__PURE__*/React.createElement("td", {
+    }, "Element"), /*#__PURE__*/React.createElement("td", {
       class: "list-header"
     }, "Affinity"), /*#__PURE__*/React.createElement("td", {
       class: "list-header"
@@ -148,9 +148,9 @@ class Main extends React.Component {
         id: `${weapon.name.toLowerCase()}-attack`,
         class: "list-cell pr-2"
       }, weapon.attack), /*#__PURE__*/React.createElement("td", {
-        id: `${weapon.name.toLowerCase()}-attribute`,
+        id: `${weapon.name.toLowerCase()}-element`,
         class: "list-cell pr-2"
-      }, weapon.attribute), /*#__PURE__*/React.createElement("td", {
+      }, weapon.element), /*#__PURE__*/React.createElement("td", {
         id: `${weapon.name.toLowerCase()}-affinity`,
         class: "list-cell pr-2"
       }, weapon.affinity), /*#__PURE__*/React.createElement("td", {
@@ -358,25 +358,25 @@ class Main extends React.Component {
             onMouseLeave: this.exitHandler
           })); // element icon(s)
 
-          if (weapon !== undefined && weapon.attribute !== "N/A") {
+          if (weapon !== undefined && weapon.element !== "N/A") {
             theTree.push( /*#__PURE__*/React.createElement("image", {
               id: `attr1-${itemMod}`,
               class: "icon",
               "data-weapon": `${cell}`,
-              href: `./public/icons/${weapon.attribute.split(" ")[0].toLowerCase()}.png`,
+              href: `./public/icons/${weapon.element.split(" ")[0].toLowerCase()}.png`,
               x: paddingX + 3 * boxWidth / 4 + boxSpaceX * x,
               y: paddingY + 5 * boxWidth / 8 + boxSpaceY * y,
               width: 5 * boxWidth / 8,
               height: 5 * boxWidth / 8
             }));
 
-            if (weapon.attribute.includes('/')) {
+            if (weapon.element.includes(' / ')) {
               // for double element dual blades
               theTree.push( /*#__PURE__*/React.createElement("image", {
                 id: `attr2-${itemMod}`,
                 class: "icon",
                 "data-weapon": `${cell}`,
-                href: `./public/icons/${weapon.attribute.split(" / ")[1].split(' ')[0].toLowerCase()}.png`,
+                href: `./public/icons/${weapon.element.split(" / ")[1].split(' ')[0].toLowerCase()}.png`,
                 x: paddingX + 3 * boxWidth / 4 + boxSpaceX * x - 3 * boxWidth / 8,
                 y: paddingY + 5 * boxWidth / 8 + boxSpaceY * y,
                 width: 5 * boxWidth / 8,
@@ -687,10 +687,10 @@ class Main extends React.Component {
       class: "pl-2"
     }, compare ? selected.attack : null)), /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("td", null, /*#__PURE__*/React.createElement("b", null, !hoverItem || altType ? null : "Element")), /*#__PURE__*/React.createElement("td", {
       id: "tool-element"
-    }, !hoverItem || altType ? '' : hoverItem.attribute), /*#__PURE__*/React.createElement("td", {
+    }, !hoverItem || altType ? '' : hoverItem.element), /*#__PURE__*/React.createElement("td", {
       id: "compare-element",
       class: "pl-2"
-    }, compare ? selected.attribute : null)), /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("td", null, /*#__PURE__*/React.createElement("b", null, !hoverItem || altType ? null : "Sharpness")), /*#__PURE__*/React.createElement("td", {
+    }, compare ? selected.element : null)), /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("td", null, /*#__PURE__*/React.createElement("b", null, !hoverItem || altType ? null : "Sharpness")), /*#__PURE__*/React.createElement("td", {
       id: "tool-sharp"
     }, !hoverItem || altType ? null : this.buildPanelSharpness(hoverItem))), /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("td", null), /*#__PURE__*/React.createElement("td", {
       id: "compare-sharp"

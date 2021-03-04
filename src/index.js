@@ -93,7 +93,7 @@ class Main extends React.Component {
       } else if ( sortKey == "bonus" ) {
         valueA = Number(valueA.slice(1)) || 0;
         valueB = Number(valueB.slice(1)) || 0;
-      }else if ( sortKey == "attribute" ) {
+      }else if ( sortKey == "element" ) {
         valueA = valueA==="n/a"?"a":valueA;
         valueB = valueB==="n/a"?"a":valueB;
       }
@@ -110,7 +110,7 @@ class Main extends React.Component {
             <tr id="list-header-row" onClick={this.clickHandler}>
               <td class="list-header header-bold">Name</td>
               <td class="list-header">Attack</td>
-              <td class="list-header">Attribute</td>
+              <td class="list-header">Element</td>
               <td class="list-header">Affinity</td>
               <td class="list-header">Sharpness</td>
               <td class="list-header">Slots</td>
@@ -125,7 +125,7 @@ class Main extends React.Component {
                 <tr id={`${weapon.name.toLowerCase()}-row`} class={weapon.name === this.state.itemSelect.name?"header-bold":null} onClick={this.clickHandler}>
                   <td id={`${weapon.name.toLowerCase()}-name`} class="list-cell pr-2" >{weapon.name}</td>
                   <td id={`${weapon.name.toLowerCase()}-attack`} class="list-cell pr-2">{weapon.attack}</td>
-                  <td id={`${weapon.name.toLowerCase()}-attribute`} class="list-cell pr-2">{weapon.attribute}</td>
+                  <td id={`${weapon.name.toLowerCase()}-element`} class="list-cell pr-2">{weapon.element}</td>
                   <td id={`${weapon.name.toLowerCase()}-affinity`} class="list-cell pr-2">{weapon.affinity}</td>
                   <td id={`${weapon.name.toLowerCase()}-sharpness`} class="list-cell pr-2">{this.buildPanelSharpness(weapon)}</td>
                   <td id={`${weapon.name.toLowerCase()}-slots`} class="list-cell pr-2">{weapon.slots}</td>
@@ -321,23 +321,23 @@ class Main extends React.Component {
                    onMouseLeave={this.exitHandler}/>
           );
           // element icon(s)
-          if ( weapon !== undefined && weapon.attribute !== "N/A" ) {
+          if ( weapon !== undefined && weapon.element !== "N/A" ) {
             theTree.push(
               <image id={`attr1-${itemMod}`}
                      class="icon"
                      data-weapon={`${cell}`}
-                     href={`./public/icons/${weapon.attribute.split(" ")[0].toLowerCase()}.png`}
+                     href={`./public/icons/${weapon.element.split(" ")[0].toLowerCase()}.png`}
                      x={paddingX + (3*boxWidth/4) + boxSpaceX*x}
                      y={paddingY + (5*boxWidth/8) + boxSpaceY*y}
                      width={5*boxWidth/8}
                      height={5*boxWidth/8}/>
             );
-            if( weapon.attribute.includes('/') ) { // for double element dual blades
+            if( weapon.element.includes(' / ') ) { // for double element dual blades
               theTree.push(
                 <image id={`attr2-${itemMod}`}
                        class="icon"
                        data-weapon={`${cell}`}
-                       href={`./public/icons/${weapon.attribute.split(" / ")[1].split(' ')[0].toLowerCase()}.png`}
+                       href={`./public/icons/${weapon.element.split(" / ")[1].split(' ')[0].toLowerCase()}.png`}
                        x={paddingX + (3*boxWidth/4) + boxSpaceX*x - 3*boxWidth/8}
                        y={paddingY + (5*boxWidth/8) + boxSpaceY*y}
                        width={5*boxWidth/8}
@@ -633,8 +633,8 @@ class Main extends React.Component {
           </tr>
           <tr>
             <td><b>{!hoverItem||altType?null:"Element"}</b></td>
-            <td id="tool-element">{!hoverItem||altType?'':hoverItem.attribute}</td>
-            <td id="compare-element" class="pl-2">{compare?selected.attribute:null}</td>
+            <td id="tool-element">{!hoverItem||altType?'':hoverItem.element}</td>
+            <td id="compare-element" class="pl-2">{compare?selected.element:null}</td>
           </tr>
           <tr>
             <td><b>{!hoverItem||altType?null:"Sharpness"}</b></td>
