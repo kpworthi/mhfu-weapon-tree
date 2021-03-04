@@ -1,5 +1,5 @@
 const NavBar = ({ title, subTitle, tagLine, changeState }) => {
-  let apps = { weapons: { title: "Weapons", location: "https://trees.nyralen.com", subs: ["Sword and Shield", "Dual Blades"]},
+  let apps = { weapons: { title: "Weapons", location: "https://trees.nyralen.com", subs: ["Sword and Shield", "Dual Blades", "Great Sword", "Long Sword"]},
                kitchen: { title: "Kitchen", location: "https://kitchen.nyralen.com", subs: ["Recipes", "Skills"]}}
 
   let clickHandler = ( event ) => {

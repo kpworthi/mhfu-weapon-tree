@@ -2,6 +2,10 @@ import snsData from './sns-data.js';
 import snsMap from './sns-map.js';
 import dbData from './db-data.js';
 import dbMap from './db-map.js';
+import gsData from './gs-data.js';
+import gsMap from './gs-map.js';
+import lsData from './ls-data.js';
+import lsMap from './ls-map.js';
 import NavBar from './navbar.js';
 
 class Main extends React.Component {
@@ -29,15 +33,21 @@ class Main extends React.Component {
     this.sharpColors = ["red", "ora", "yel", "gre", "blu", "whi", "pur"];
     this.dataAndMaps = {
       'sword and shield': [snsData, snsMap, 'sns'],
-      'dual blades': [dbData, dbMap, 'db']
+      'dual blades': [dbData, dbMap, 'db'],
+      'great sword': [gsData, gsMap, 'gs'],
+      'long sword': [lsData, lsMap, 'ls']
     };
     this.weaponAlts = {
       'sword and shield': ['Dual Blades', 'db'],
-      'dual blades': ['Sword and Shield', 'sns']
+      'dual blades': ['Sword and Shield', 'sns'],
+      'great sword': ['Long Sword', 'ls'],
+      'long sword': ['Great Sword', 'gs']
     };
     this.abbr = {
       'sword and shield': ['sns', 'db'],
-      'dual blades': ['db', 'sns']
+      'dual blades': ['db', 'sns'],
+      'great sword': ['gs', 'ls'],
+      'long sword': ['ls', 'gs']
     };
 
     this.changeState = stateObj => {
