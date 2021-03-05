@@ -76,6 +76,8 @@ body {
 }
 
 /* NavBar styles */
+
+#temp-wrapper { padding: 0 15px;}
 #nav-bar{
   margin-top: 10px;
   background-color: lightcyan;
