@@ -23,7 +23,7 @@
     height: calc((100vh - 150px) / 3)!important;
   }
   #sub-dropdown {
-    min-width: auto!important;
+    min-width: 150px!important;
   }
   #zoomInBtn { right: 130px!important; }
   #zoomOutBtn { right: 88px!important; }
