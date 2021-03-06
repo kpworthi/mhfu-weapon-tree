@@ -116,7 +116,6 @@ body {
 .dropdown-opt-list {
   position: absolute;
   display: none;
-  width: max-content;
   max-height: calc(100vh - 125px);
   overflow-y: auto;
   top: 100%;
