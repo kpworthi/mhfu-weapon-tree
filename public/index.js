@@ -1,11 +1,4 @@
-import snsData from './sns-data.js';
-import snsMap from './sns-map.js';
-import dbData from './db-data.js';
-import dbMap from './db-map.js';
-import gsData from './gs-data.js';
-import gsMap from './gs-map.js';
-import lsData from './ls-data.js';
-import lsMap from './ls-map.js';
+import snsData, { snsMap } from './sns-bundle.js';
 import NavBar from './navbar.js';
 
 class Main extends React.Component {
@@ -30,25 +23,25 @@ class Main extends React.Component {
     this.ctrlState = false;
     this.dragX = 0;
     this.dragY = 0;
-    this.sharpColors = ["red", "ora", "yel", "gre", "blu", "whi", "pur"];
+    this.sharpColors = ["red", "ora", "yel", "gre", "blu", "whi", "pur"]; // only load sns info to start, load rest after rendering
+
     this.dataAndMaps = {
       'sword and shield': [snsData, snsMap, 'sns'],
-      'dual blades': [dbData, dbMap, 'db'],
-      'great sword': [gsData, gsMap, 'gs'],
-      'long sword': [lsData, lsMap, 'ls']
+      'dual blades': ['', '', 'db'],
+      'great sword': ['', '', 'gs'],
+      'long sword': ['', '', 'ls'],
+      'hunting horn': ['', '', 'hh'],
+      'hammer': ['', '', 'hm']
     };
     this.weaponAlts = {
       'sword and shield': ['Dual Blades', 'db'],
       'dual blades': ['Sword and Shield', 'sns'],
       'great sword': ['Long Sword', 'ls'],
-      'long sword': ['Great Sword', 'gs']
+      'long sword': ['Great Sword', 'gs'],
+      'hunting horn': ['Hammer', 'hm'],
+      'hammer': ['Hunting Horn', 'hh']
     };
-    this.abbr = {
-      'sword and shield': ['sns', 'db'],
-      'dual blades': ['db', 'sns'],
-      'great sword': ['gs', 'ls'],
-      'long sword': ['ls', 'gs']
-    };
+    this.hhSongs = [['Move Spd Up (Self)', 'ww'], ['Move Spd Up (Self)', 'pp'], ['Stagger Protection (Self)', 'ww'], ['Stagger Protection (Self)', 'pp'], ['Auto Detect', 'bba'], ['Attack Up (Small)', 'wr'], ['Attack Up (Large)', 'prr'], ['Elemental Attack Up', 'ybyw'], ['Supersonic Waves', 'yyy'], ['Defense Up (Small)', 'ry'], ['Defense Up (Large)', 'rgr'], ['Divine Protection', 'gypy'], ['Heal 20', 'pg'], ['Heal 30', 'gpy'], ['Heal 60', 'ggpa'], ['Heal 20 w/ Antidote', 'wg'], ['Heal 30 w/ Antidote', 'gbpb'], ['Heal 30 w/ Deoderant', 'gwa'], ['Max HP +20', 'rbw'], ['Max HP +30', 'rra'], ['Max HP +50', 'rbrp'], ['Recovery Speed Up (Small)', 'ggy'], ['Recovery Speed Up (Large)', 'grgp'], ['Earplugs (Small)', 'aar'], ['Earplugs (Large)', 'aagp'], ['Stun Negated', 'abp'], ['Cold and Freeze Negated', 'aay'], ['Heat Negated', 'aga'], ['Paralysis Negated', 'ayy'], ['Tremors Negated', 'aya'], ['Wind Resist (Small)', 'bbr'], ['Wind Resist (Large)', 'bab'], ['Wind Pressure Negated', 'bbyp'], ['Infinite Stamina (Small)', 'wb'], ['Infinite Stamina (Large)', 'pbb'], ['Fire Resist (Small)', 'yr'], ['Fire Resist (Large)', 'ybw'], ['Water Resist (Small)', 'ybp'], ['Water Resist (Large)', 'ybbw'], ['Ice Resist (Small)', 'ywa'], ['Ice Resist (Large)', 'ypa'], ['Thunder Resist (Small)', 'yap'], ['Thunder Resist (Large)', 'yyb'], ['Dragon Resist (Small)', 'wy'], ['Dragon Resist (Large)', 'pyy']];
 
     this.changeState = stateObj => {
       this.setState(stateObj);
@@ -67,6 +60,26 @@ class Main extends React.Component {
   componentDidMount() {
     document.onkeydown = this.keyHandler;
     document.onkeyup = this.keyHandler;
+    import('./db-bundle.js').then(module => {
+      this.dataAndMaps['dual blades'][0] = module.default;
+      this.dataAndMaps['dual blades'][1] = module.dbMap;
+    });
+    import('./gs-bundle.js').then(module => {
+      this.dataAndMaps['great sword'][0] = module.default;
+      this.dataAndMaps['great sword'][1] = module.gsMap;
+    });
+    import('./ls-bundle.js').then(module => {
+      this.dataAndMaps['long sword'][0] = module.default;
+      this.dataAndMaps['long sword'][1] = module.lsMap;
+    });
+    import('./hh-bundle.js').then(module => {
+      this.dataAndMaps['hunting horn'][0] = module.default;
+      this.dataAndMaps['hunting horn'][1] = module.hhMap;
+    });
+    import('./hm-bundle.js').then(module => {
+      this.dataAndMaps['hammer'][0] = module.default;
+      this.dataAndMaps['hammer'][1] = module.hmMap;
+    });
   }
 
   componentDidUpdate() {
@@ -136,7 +149,9 @@ class Main extends React.Component {
       class: "list-header"
     }, "Element"), /*#__PURE__*/React.createElement("td", {
       class: "list-header"
-    }, "Affinity"), /*#__PURE__*/React.createElement("td", {
+    }, "Affinity"), this.state.subTitle !== "hunting horn" ? null : /*#__PURE__*/React.createElement("td", {
+      class: "list-header"
+    }, "Notes"), /*#__PURE__*/React.createElement("td", {
       class: "list-header"
     }, "Sharpness"), /*#__PURE__*/React.createElement("td", {
       class: "list-header"
@@ -163,7 +178,10 @@ class Main extends React.Component {
       }, weapon.element), /*#__PURE__*/React.createElement("td", {
         id: `${weapon.name.toLowerCase()}-affinity`,
         class: "list-cell pr-2"
-      }, weapon.affinity), /*#__PURE__*/React.createElement("td", {
+      }, weapon.affinity), weapon.type !== "hh" ? null : /*#__PURE__*/React.createElement("td", {
+        id: `${weapon.name.toLowerCase()}-notes`,
+        class: "list-cell pr-2"
+      }, this.buildNotesList(weapon.notes)), /*#__PURE__*/React.createElement("td", {
         id: `${weapon.name.toLowerCase()}-sharpness`,
         class: "list-cell pr-2"
       }, this.buildPanelSharpness(weapon)), /*#__PURE__*/React.createElement("td", {
@@ -433,7 +451,7 @@ class Main extends React.Component {
         } // handle click on list item (not tree link)
         else if (event.currentTarget.id.endsWith('row')) {
             this.setState({
-              itemSelect: this.dataAndMaps[this.state.subTitle][0].find(weapon => weapon.name.toLowerCase() === event.currentTarget.id.split('-')[0])
+              itemSelect: this.dataAndMaps[this.state.subTitle][0].find(weapon => weapon.name.toLowerCase() === event.currentTarget.id.split('-row')[0])
             });
           } // handle click on list tree link
           else if (event.currentTarget.id.endsWith("tree-link") && event.currentTarget.textContent) {
@@ -503,7 +521,7 @@ class Main extends React.Component {
 
   btnListTreeLink(eventCurrTgtId) {
     this.setState({
-      itemSelect: this.dataAndMaps[this.state.subTitle][0].find(weapon => weapon.name.toLowerCase() === eventCurrTgtId.split('-')[0]),
+      itemSelect: this.dataAndMaps[this.state.subTitle][0].find(weapon => weapon.name.toLowerCase() === eventCurrTgtId.split('-tree')[0]),
       mode: 'tree'
     }, () => {
       let borders = Array.from(document.querySelectorAll('.icon-border'));
@@ -629,6 +647,41 @@ class Main extends React.Component {
     }
   }
 
+  buildNotesList(noteString, preview = true) {
+    let noteArray = noteString.match(/\.[a-z]+/g).map(newNote => {
+      switch (newNote.slice(1)) {
+        case 'a':
+          return 'aqua';
+
+        case 'b':
+          return 'blue';
+
+        case 'p':
+          return 'purple';
+
+        case 'y':
+          return 'yellow';
+
+        case 'r':
+          return 'red';
+
+        case 'w':
+          return 'white';
+
+        default:
+          return newNote.slice(1);
+      }
+    });
+    return /*#__PURE__*/React.createElement("div", {
+      class: "note-wrapper"
+    }, noteArray.map(color => /*#__PURE__*/React.createElement("div", {
+      class: `note-block${preview ? "-empty" : ""} ${preview ? "s" : ""} ${color.slice(0, 3)} ml-1`
+    }, preview ? null : /*#__PURE__*/React.createElement("img", {
+      class: "note",
+      src: "./public/note3.png"
+    }))));
+  }
+
   buildPanelSharpness(weapon) {
     let sharpness = [];
     let sharpString = weapon.sharpness;
@@ -637,13 +690,15 @@ class Main extends React.Component {
       sharpness.push(sharpString.slice(i, i + 4));
     }
 
-    return /*#__PURE__*/React.createElement("div", {
-      class: "sharp-container"
-    }, sharpness.map((str, ind) => {
+    if (sharpString === 'Unknown') return "Info Needed";else {
       return /*#__PURE__*/React.createElement("div", {
-        class: `sharp-bar ${str[0].toLowerCase()} ${str.slice(1)} ${ind > 0 && sharpness[ind - 1].slice(-3) === str.slice(-3) ? 'sh-dbl' : null}`
-      });
-    }));
+        class: "sharp-container"
+      }, sharpness.map((str, ind) => {
+        return /*#__PURE__*/React.createElement("div", {
+          class: `sharp-bar ${str[0].toLowerCase()} ${str.slice(1)} ${ind > 0 && sharpness[ind - 1].slice(-3) === str.slice(-3) ? 'sh-dbl' : null}`
+        });
+      }));
+    }
   }
 
   hoverHandler(event) {
@@ -711,6 +766,12 @@ class Main extends React.Component {
     let selectedWeapon = this.state.itemSelect;
     let title = this.state.appTitle;
     let subTitle = this.state.subTitle;
+    let noteArray = [];
+
+    if (selectedWeapon && selectedWeapon.type === "hh") {
+      noteArray = selectedWeapon.notes.match(/\.[a-z]+/g).map(newNote => newNote.slice(1, 2));
+    }
+
     return /*#__PURE__*/React.createElement("div", {
       id: "app-wrapper",
       class: "container-fluid d-flex flex-column"
@@ -751,7 +812,7 @@ class Main extends React.Component {
       id: "panel-name",
       class: "text-center",
       colspan: "2"
-    }, selectedWeapon.name), " ")), /*#__PURE__*/React.createElement("tbody", null, Object.keys(selectedWeapon).slice(1, 8).map(key => {
+    }, selectedWeapon.name), " ")), /*#__PURE__*/React.createElement("tbody", null, Object.keys(selectedWeapon).slice(1, selectedWeapon.type === "hh" ? 9 : 8).map(key => {
       let title = key.split('');
       title[0] = title[0].toUpperCase();
       title = title.join('');
@@ -760,8 +821,27 @@ class Main extends React.Component {
       }, /*#__PURE__*/React.createElement("b", null, title == "Bonus" ? "Defense Bonus" : title)), /*#__PURE__*/React.createElement("td", {
         id: `panel-${key}`,
         class: "px-1"
-      }, key == "sharpness" ? this.buildPanelSharpness(this.state.itemSelect) : selectedWeapon[key]));
-    }))), selectedWeapon === "" ? null : /*#__PURE__*/React.createElement("table", {
+      }, key == "sharpness" ? this.buildPanelSharpness(this.state.itemSelect) : key === "notes" ? this.buildNotesList(selectedWeapon.notes, false) : selectedWeapon[key]));
+    }))),
+    /* Song List */
+    selectedWeapon === "" || selectedWeapon.type !== "hh" ? null : /*#__PURE__*/React.createElement("table", {
+      id: "panel-song-list",
+      class: "panel-song-list ml-2"
+    }, /*#__PURE__*/React.createElement("thead", null, /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("th", {
+      id: "panel-name",
+      class: "text-center",
+      colspan: "2"
+    }, "Song List"))), /*#__PURE__*/React.createElement("tbody", null, this.hhSongs.filter(song => {
+      if (song[1].split('').every(color => noteArray.includes(color))) return true;else return false;
+    }).map(validSong => /*#__PURE__*/React.createElement("tr", {
+      class: "valid-song-row"
+    }, /*#__PURE__*/React.createElement("td", {
+      class: "valid-song-notes pl-2"
+    }, this.buildNotesList("." + validSong[1].split('').join('.'), false)), /*#__PURE__*/React.createElement("td", {
+      class: "valid-song-name pl-2"
+    }, validSong[0]))))),
+    /* Creation Table */
+    selectedWeapon === "" ? null : /*#__PURE__*/React.createElement("table", {
       id: "panel-create-table",
       class: "panel-create-table ml-2"
     }, /*#__PURE__*/React.createElement("thead", null, /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("th", {
@@ -785,7 +865,9 @@ class Main extends React.Component {
       }, selectedWeapon[key]));
     }) : /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("td", {
       class: "cell-type-unavail"
-    }, "This weapon cannot be created from scratch.")))), selectedWeapon === "" ? null : /*#__PURE__*/React.createElement("table", {
+    }, "This weapon cannot be created from scratch.")))),
+    /* Upgrade Table */
+    selectedWeapon === "" ? null : /*#__PURE__*/React.createElement("table", {
       id: "panel-upgrade-table",
       class: "panel-upgrade-table ml-2 mb-3"
     }, /*#__PURE__*/React.createElement("thead", null, /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("th", {

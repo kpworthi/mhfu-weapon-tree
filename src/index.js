@@ -1,11 +1,4 @@
-import snsData from './sns-data.js';
-import snsMap from './sns-map.js';
-import dbData from './db-data.js';
-import dbMap from './db-map.js';
-import gsData from './gs-data.js';
-import gsMap from './gs-map.js';
-import lsData from './ls-data.js';
-import lsMap from './ls-map.js';
+import snsData, { snsMap } from './sns-bundle.js';
 import NavBar from './navbar.js';
 
 class Main extends React.Component {
@@ -34,24 +27,72 @@ class Main extends React.Component {
     this.dragY = 0;
     this.sharpColors = ["red", "ora", "yel", "gre", "blu", "whi", "pur"];
 
+
+    // only load sns info to start, load rest after rendering
     this.dataAndMaps = { 
       'sword and shield': [snsData, snsMap, 'sns'], 
-      'dual blades': [dbData, dbMap, 'db'],
-      'great sword': [gsData, gsMap, 'gs'],
-      'long sword' : [lsData, lsMap, 'ls']
+      'dual blades'  : ['', '', 'db'],
+      'great sword'  : ['', '', 'gs'],
+      'long sword'   : ['', '', 'ls'],
+      'hunting horn' : ['', '', 'hh'],
+      'hammer'       : ['', '', 'hm']
     }
     this.weaponAlts  = { 
       'sword and shield': ['Dual Blades', 'db'], 
       'dual blades': ['Sword and Shield', 'sns'],
       'great sword': ['Long Sword', 'ls'],
-      'long sword' : ['Great Sword', 'gs']
-     }
-    this.abbr        = { 
-      'sword and shield': ['sns', 'db'], 
-      'dual blades': ['db', 'sns'],
-      'great sword': ['gs', 'ls'],
-      'long sword' : ['ls', 'gs']
-      }
+      'long sword' : ['Great Sword', 'gs'],
+      'hunting horn': ['Hammer', 'hm'],
+      'hammer' : ['Hunting Horn', 'hh']
+    }
+
+    this.hhSongs = [
+      ['Move Spd Up (Self)', 'ww'],
+      ['Move Spd Up (Self)', 'pp'],
+      ['Stagger Protection (Self)', 'ww'],
+      ['Stagger Protection (Self)', 'pp'],
+      ['Auto Detect', 'bba'],
+      ['Attack Up (Small)', 'wr'],
+      ['Attack Up (Large)', 'prr'],
+      ['Elemental Attack Up', 'ybyw'],
+      ['Supersonic Waves', 'yyy'],
+      ['Defense Up (Small)', 'ry'],
+      ['Defense Up (Large)', 'rgr'],
+      ['Divine Protection', 'gypy'],
+      ['Heal 20', 'pg'],
+      ['Heal 30', 'gpy'],
+      ['Heal 60', 'ggpa'],
+      ['Heal 20 w/ Antidote', 'wg'],
+      ['Heal 30 w/ Antidote', 'gbpb'],
+      ['Heal 30 w/ Deoderant', 'gwa'],
+      ['Max HP +20', 'rbw'],
+      ['Max HP +30', 'rra'],
+      ['Max HP +50', 'rbrp'],
+      ['Recovery Speed Up (Small)', 'ggy'],
+      ['Recovery Speed Up (Large)', 'grgp'],
+      ['Earplugs (Small)', 'aar'],
+      ['Earplugs (Large)', 'aagp'],
+      ['Stun Negated', 'abp'],
+      ['Cold and Freeze Negated', 'aay'],
+      ['Heat Negated', 'aga'],
+      ['Paralysis Negated', 'ayy'],
+      ['Tremors Negated', 'aya'],
+      ['Wind Resist (Small)', 'bbr'],
+      ['Wind Resist (Large)', 'bab'],
+      ['Wind Pressure Negated', 'bbyp'],
+      ['Infinite Stamina (Small)', 'wb'],
+      ['Infinite Stamina (Large)', 'pbb'],
+      ['Fire Resist (Small)', 'yr'],
+      ['Fire Resist (Large)', 'ybw'],
+      ['Water Resist (Small)', 'ybp'],
+      ['Water Resist (Large)', 'ybbw'],
+      ['Ice Resist (Small)', 'ywa'],
+      ['Ice Resist (Large)', 'ypa'],
+      ['Thunder Resist (Small)', 'yap'],
+      ['Thunder Resist (Large)', 'yyb'],
+      ['Dragon Resist (Small)', 'wy'],
+      ['Dragon Resist (Large)', 'pyy']
+    ]
 
     this.changeState = ( stateObj ) => { this.setState(stateObj) }
 
@@ -68,6 +109,31 @@ class Main extends React.Component {
   componentDidMount(){
     document.onkeydown = this.keyHandler;
     document.onkeyup = this.keyHandler;
+    import('./db-bundle.js')
+      .then( module => {
+        this.dataAndMaps['dual blades'][0] = module.default;
+        this.dataAndMaps['dual blades'][1] = module.dbMap;
+      });
+    import('./gs-bundle.js')
+      .then( module => {
+        this.dataAndMaps['great sword'][0] = module.default;
+        this.dataAndMaps['great sword'][1] = module.gsMap;
+      });
+    import('./ls-bundle.js')
+      .then( module => {
+        this.dataAndMaps['long sword'][0] = module.default;
+        this.dataAndMaps['long sword'][1] = module.lsMap;
+      });
+    import('./hh-bundle.js')
+      .then( module => {
+        this.dataAndMaps['hunting horn'][0] = module.default;
+        this.dataAndMaps['hunting horn'][1] = module.hhMap;
+      });
+    import('./hm-bundle.js')
+      .then( module => {
+        this.dataAndMaps['hammer'][0] = module.default;
+        this.dataAndMaps['hammer'][1] = module.hmMap;
+      });
   }
 
   componentDidUpdate(){
@@ -131,6 +197,8 @@ class Main extends React.Component {
               <td class="list-header">Attack</td>
               <td class="list-header">Element</td>
               <td class="list-header">Affinity</td>
+              {this.state.subTitle !== "hunting horn"?null:
+              <td class="list-header">Notes</td>}
               <td class="list-header">Sharpness</td>
               <td class="list-header">Slots</td>
               <td class="list-header">Defense</td>
@@ -146,6 +214,8 @@ class Main extends React.Component {
                   <td id={`${weapon.name.toLowerCase()}-attack`} class="list-cell pr-2">{weapon.attack}</td>
                   <td id={`${weapon.name.toLowerCase()}-element`} class="list-cell pr-2">{weapon.element}</td>
                   <td id={`${weapon.name.toLowerCase()}-affinity`} class="list-cell pr-2">{weapon.affinity}</td>
+                  {weapon.type !== "hh"?null:
+                  <td id={`${weapon.name.toLowerCase()}-notes`} class="list-cell pr-2">{this.buildNotesList(weapon.notes)}</td>}
                   <td id={`${weapon.name.toLowerCase()}-sharpness`} class="list-cell pr-2">{this.buildPanelSharpness(weapon)}</td>
                   <td id={`${weapon.name.toLowerCase()}-slots`} class="list-cell pr-2">{weapon.slots}</td>
                   <td id={`${weapon.name.toLowerCase()}-defense`} class="list-cell pr-2">{weapon.bonus}</td>
@@ -401,7 +471,7 @@ class Main extends React.Component {
     // handle click on list item (not tree link)
     else if ( event.currentTarget.id.endsWith('row') ) {
       this.setState({
-        itemSelect: this.dataAndMaps[this.state.subTitle][0].find(weapon => weapon.name.toLowerCase()===event.currentTarget.id.split('-')[0])
+        itemSelect: this.dataAndMaps[this.state.subTitle][0].find(weapon => weapon.name.toLowerCase()===event.currentTarget.id.split('-row')[0])
       });
     }
     // handle click on list tree link
@@ -475,7 +545,7 @@ class Main extends React.Component {
 
   btnListTreeLink ( eventCurrTgtId ) {
     this.setState({
-      itemSelect: this.dataAndMaps[this.state.subTitle][0].find(weapon => weapon.name.toLowerCase() === eventCurrTgtId.split('-')[0]),
+      itemSelect: this.dataAndMaps[this.state.subTitle][0].find(weapon => weapon.name.toLowerCase() === eventCurrTgtId.split('-tree')[0]),
       mode: 'tree'
     }, () => {
       let borders = Array.from(document.querySelectorAll('.icon-border'))
@@ -588,21 +658,46 @@ class Main extends React.Component {
     }
   }
 
+  buildNotesList ( noteString, preview = true ) {
+    let noteArray = noteString.match(/\.[a-z]+/g).map( newNote => {
+      switch (newNote.slice(1)){
+        case 'a': return 'aqua';
+        case 'b': return 'blue';
+        case 'p': return 'purple';
+        case 'y': return 'yellow';
+        case 'r': return 'red';
+        case 'w': return 'white';
+        default: return newNote.slice(1);
+      }
+    })
+    return (
+      <div class="note-wrapper">
+        {noteArray.map( color => 
+          <div class={`note-block${preview?"-empty":""} ${preview?"s":""} ${color.slice(0,3)} ml-1`} >
+            {preview?null:<img class="note" src="./public/note3.png" />}
+          </div> )}
+      </div>
+    )
+  }
+
   buildPanelSharpness ( weapon ) {
     let sharpness = [];
     let sharpString = weapon.sharpness;
     for (let i=0; i<sharpString.length; i+=4) {
       sharpness.push(sharpString.slice(i,i+4));
     }
-    return (
-      <div class="sharp-container">
-        {sharpness.map( (str, ind) => {
-          return (
-            <div class={`sharp-bar ${str[0].toLowerCase()} ${str.slice(1)} ${ind>0&&sharpness[ind-1].slice(-3)===str.slice(-3)?'sh-dbl':null}`}/>
+    if ( sharpString === 'Unknown' ) return "Info Needed";
+    else{
+      return (
+        <div class="sharp-container">
+          {sharpness.map( (str, ind) => {
+            return (
+              <div class={`sharp-bar ${str[0].toLowerCase()} ${str.slice(1)} ${ind>0&&sharpness[ind-1].slice(-3)===str.slice(-3)?'sh-dbl':null}`}/>
+            )}
           )}
-        )}
-      </div>
-    )
+        </div>
+      )
+    }
   }
 
   hoverHandler ( event ) {
@@ -675,6 +770,10 @@ class Main extends React.Component {
     let selectedWeapon = this.state.itemSelect;
     let title = this.state.appTitle;
     let subTitle = this.state.subTitle;
+    let noteArray = [];
+    if (selectedWeapon && selectedWeapon.type==="hh"){
+      noteArray = selectedWeapon.notes.match(/\.[a-z]+/g).map( newNote => newNote.slice(1,2) )
+    }
     return(
       <div id="app-wrapper" class="container-fluid d-flex flex-column" >
         <NavBar title={title} subTitle={subTitle} tagLine={this.state.tagLine} changeState={this.changeState}/>
@@ -691,25 +790,55 @@ class Main extends React.Component {
             {this.displayTree()}
           </div>
           :this.displayList()}
+
+          {/* Info Panel Start - A bit unwieldy now, to be separated later */}
+
           <div id="info-panel" class="pt-1 pb-3 col-md-4 col-lg-3">
             <h2 class="title">Info Panel</h2>
             {selectedWeapon===""?null:(
             <table id="panel-main-table" class="panel-main-table ml-2">
               <thead><tr> <th id="panel-name" class="text-center" colspan="2">{selectedWeapon.name}</th> </tr></thead>
               <tbody>
-                {Object.keys(selectedWeapon).slice(1,8).map( key => {
+                {Object.keys(selectedWeapon).slice(1,selectedWeapon.type==="hh"?9:8).map( key => {
                   let title = key.split(''); title[0] = title[0].toUpperCase(); title = title.join('');
                   return (
                     <tr>
                       <td class="px-1"><b>{title=="Bonus"?"Defense Bonus":title}</b></td>
-                      <td id={`panel-${key}`} class="px-1">{key=="sharpness"?this.buildPanelSharpness(this.state.itemSelect):selectedWeapon[key]}</td>
+                      <td id={`panel-${key}`} class="px-1">
+                        {key=="sharpness"?this.buildPanelSharpness(this.state.itemSelect):
+                                          key==="notes"?this.buildNotesList(selectedWeapon.notes, false):selectedWeapon[key]}
+                      </td>
                     </tr>
                   )
                 })}
               </tbody>
             </table>
             )}
-            {selectedWeapon===""?null:(
+            {/* Song List */
+            selectedWeapon===""||selectedWeapon.type!=="hh"?null:(
+            <table id="panel-song-list" class="panel-song-list ml-2">
+              <thead>
+                <tr>
+                  <th id="panel-name" class="text-center" colspan="2">Song List</th>
+                </tr>
+              </thead>
+              <tbody>
+                {this.hhSongs
+                  .filter( song => {
+                    if ( song[1].split('').every( color => noteArray.includes(color) ) ) return true;
+                    else return false;
+                  }).map( validSong => (
+                    <tr class="valid-song-row">
+                      <td class="valid-song-notes pl-2">{this.buildNotesList("."+validSong[1].split('').join('.'), false)}</td>
+                      <td class="valid-song-name pl-2">{validSong[0]}</td>
+                    </tr>
+                  )
+                )}
+              </tbody>
+            </table>
+            )}
+            {/* Creation Table */
+            selectedWeapon===""?null:(
             <table id="panel-create-table" class="panel-create-table ml-2">
               <thead>
                 <tr>
@@ -731,7 +860,8 @@ class Main extends React.Component {
               </tbody>
             </table>
             )}
-            {selectedWeapon===""?null:(
+            {/* Upgrade Table */
+            selectedWeapon===""?null:(
             <table id="panel-upgrade-table" class="panel-upgrade-table ml-2 mb-3">
               <thead>
                 <tr>

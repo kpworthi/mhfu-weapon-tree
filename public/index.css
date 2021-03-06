@@ -94,6 +94,10 @@ body {
   flex-direction: column;
 }
 
+#sub-dropdown {
+  min-width: 333px;
+}
+
 .dropdown-curr { 
   position: relative;
   display: flex;
@@ -301,6 +305,38 @@ body {
   border: 1px solid black;
 }
 
+/* Note Classes */
+
+.note-block-empty {
+  display: inline-block;
+  height: 10px;
+  border: 1px solid black;
+}
+
+.note-block {
+  display: inline-block;
+  height: 10px;
+  border: 1px solid black;
+}
+
+.note-wrapper {
+	display: flex;
+	flex-wrap: nowrap;
+	align-items: center;
+}
+
+.note-block {
+	display: inline-block;
+	height: 18px;
+	border: 1px solid black;
+}
+
+.note {
+  vertical-align: top!important;
+  height:18px;
+  width: 18px;
+}
+
 /* Sharpness Classes */
 
 .sharp-container {
@@ -324,6 +360,7 @@ body {
 .blu { background-color: blue; }
 .whi { background-color: white; }
 .pur { background-color: purple;}
+.aqu { background-color: aqua; }
 
 .n { width: 0px; }
 .t { width: 5px; }
@@ -332,3 +369,6 @@ body {
 .b { width: 20px; }
 
 .sh-dbl { border-left: 0px!important; }
+
+
+
