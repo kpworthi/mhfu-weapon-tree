@@ -23,7 +23,7 @@ class Main extends React.Component {
     this.ctrlState = false;
     this.dragX = 0;
     this.dragY = 0;
-    this.sharpColors = ["red", "ora", "yel", "gre", "blu", "whi", "pur"]; // only load sns info to start, load rest after rendering
+    this.wpnsWithExtra = ['hh', 'gl']; // only load sns info to start, load rest after rendering
 
     this.dataAndMaps = {
       'sword and shield': [snsData, snsMap, 'sns'],
@@ -31,7 +31,9 @@ class Main extends React.Component {
       'great sword': ['', '', 'gs'],
       'long sword': ['', '', 'ls'],
       'hunting horn': ['', '', 'hh'],
-      'hammer': ['', '', 'hm']
+      'hammer': ['', '', 'hm'],
+      'gunlance': ['', '', 'gl'],
+      'lance': ['', '', 'la']
     };
     this.weaponAlts = {
       'sword and shield': ['Dual Blades', 'db'],
@@ -39,7 +41,9 @@ class Main extends React.Component {
       'great sword': ['Long Sword', 'ls'],
       'long sword': ['Great Sword', 'gs'],
       'hunting horn': ['Hammer', 'hm'],
-      'hammer': ['Hunting Horn', 'hh']
+      'hammer': ['Hunting Horn', 'hh'],
+      'gunlance': ['Lance', 'la'],
+      'lance': ['Gunlance', 'gl']
     };
     this.hhSongs = [['Move Spd Up (Self)', 'ww'], ['Move Spd Up (Self)', 'pp'], ['Stagger Protection (Self)', 'ww'], ['Stagger Protection (Self)', 'pp'], ['Auto Detect', 'bba'], ['Attack Up (Small)', 'wr'], ['Attack Up (Large)', 'prr'], ['Elemental Attack Up', 'ybyw'], ['Supersonic Waves', 'yyy'], ['Defense Up (Small)', 'ry'], ['Defense Up (Large)', 'rgr'], ['Divine Protection', 'gypy'], ['Heal 20', 'pg'], ['Heal 30', 'gpy'], ['Heal 60', 'ggpa'], ['Heal 20 w/ Antidote', 'wg'], ['Heal 30 w/ Antidote', 'gbpb'], ['Heal 30 w/ Deoderant', 'gwa'], ['Max HP +20', 'rbw'], ['Max HP +30', 'rra'], ['Max HP +50', 'rbrp'], ['Recovery Speed Up (Small)', 'ggy'], ['Recovery Speed Up (Large)', 'grgp'], ['Earplugs (Small)', 'aar'], ['Earplugs (Large)', 'aagp'], ['Stun Negated', 'abp'], ['Cold and Freeze Negated', 'aay'], ['Heat Negated', 'aga'], ['Paralysis Negated', 'ayy'], ['Tremors Negated', 'aya'], ['Wind Resist (Small)', 'bbr'], ['Wind Resist (Large)', 'bab'], ['Wind Pressure Negated', 'bbyp'], ['Infinite Stamina (Small)', 'wb'], ['Infinite Stamina (Large)', 'pbb'], ['Fire Resist (Small)', 'yr'], ['Fire Resist (Large)', 'ybw'], ['Water Resist (Small)', 'ybp'], ['Water Resist (Large)', 'ybbw'], ['Ice Resist (Small)', 'ywa'], ['Ice Resist (Large)', 'ypa'], ['Thunder Resist (Small)', 'yap'], ['Thunder Resist (Large)', 'yyb'], ['Dragon Resist (Small)', 'wy'], ['Dragon Resist (Large)', 'pyy']];
 
@@ -79,6 +83,14 @@ class Main extends React.Component {
     import('./hm-bundle.js').then(module => {
       this.dataAndMaps['hammer'][0] = module.default;
       this.dataAndMaps['hammer'][1] = module.hmMap;
+    });
+    import('./gl-bundle.js').then(module => {
+      this.dataAndMaps['gunlance'][0] = module.default;
+      this.dataAndMaps['gunlance'][1] = module.glMap;
+    });
+    import('./la-bundle.js').then(module => {
+      this.dataAndMaps['lance'][0] = module.default;
+      this.dataAndMaps['lance'][1] = module.laMap;
     });
   }
 
@@ -151,7 +163,9 @@ class Main extends React.Component {
       class: "list-header"
     }, "Affinity"), this.state.subTitle !== "hunting horn" ? null : /*#__PURE__*/React.createElement("td", {
       class: "list-header"
-    }, "Notes"), /*#__PURE__*/React.createElement("td", {
+    }, "Notes"), this.state.subTitle !== "gunlance" ? null : /*#__PURE__*/React.createElement("td", {
+      class: "list-header"
+    }, "Shelling"), /*#__PURE__*/React.createElement("td", {
       class: "list-header"
     }, "Sharpness"), /*#__PURE__*/React.createElement("td", {
       class: "list-header"
@@ -181,7 +195,10 @@ class Main extends React.Component {
       }, weapon.affinity), weapon.type !== "hh" ? null : /*#__PURE__*/React.createElement("td", {
         id: `${weapon.name.toLowerCase()}-notes`,
         class: "list-cell pr-2"
-      }, this.buildNotesList(weapon.notes)), /*#__PURE__*/React.createElement("td", {
+      }, this.buildNotesList(weapon.notes)), weapon.type !== "gl" ? null : /*#__PURE__*/React.createElement("td", {
+        id: `${weapon.name.toLowerCase()}-shelling`,
+        class: "list-cell pr-2"
+      }, weapon.shelling), /*#__PURE__*/React.createElement("td", {
         id: `${weapon.name.toLowerCase()}-sharpness`,
         class: "list-cell pr-2"
       }, this.buildPanelSharpness(weapon)), /*#__PURE__*/React.createElement("td", {
@@ -678,7 +695,7 @@ class Main extends React.Component {
       class: `note-block${preview ? "-empty" : ""} ${preview ? "s" : ""} ${color.slice(0, 3)} ml-1`
     }, preview ? null : /*#__PURE__*/React.createElement("img", {
       class: "note",
-      src: "./public/note3.png"
+      src: "./public/icons/note3.png"
     }))));
   }
 
@@ -812,7 +829,7 @@ class Main extends React.Component {
       id: "panel-name",
       class: "text-center",
       colspan: "2"
-    }, selectedWeapon.name), " ")), /*#__PURE__*/React.createElement("tbody", null, Object.keys(selectedWeapon).slice(1, selectedWeapon.type === "hh" ? 9 : 8).map(key => {
+    }, selectedWeapon.name), " ")), /*#__PURE__*/React.createElement("tbody", null, Object.keys(selectedWeapon).slice(1, this.wpnsWithExtra.includes(selectedWeapon.type) ? 9 : 8).map(key => {
       let title = key.split('');
       title[0] = title[0].toUpperCase();
       title = title.join('');

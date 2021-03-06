@@ -7,9 +7,11 @@ const NavBar = ({ title, subTitle, tagLine, changeState }) => {
         "Sword and Shield", 
         "Dual Blades", 
         "Great Sword", 
-        "Long Sword", 
-        "Hunting Horn", 
-        "Hammer"
+        "Long Sword",
+        "Hunting Horn",
+        "Hammer",
+        "Gunlance",
+        "Lance"
       ]
     },
     kitchen: { 
@@ -58,8 +60,6 @@ const NavBar = ({ title, subTitle, tagLine, changeState }) => {
       }
     })
     
-  
-    //document.addEventListener('click', outsideClick);
     return (
       <div class="dropdown-wrapper mx-1">
         <div id={`${type}-dropdown`} class="nav-drop" onClick={clickHandler}>
@@ -67,7 +67,11 @@ const NavBar = ({ title, subTitle, tagLine, changeState }) => {
             <span tabindex="0" class="dropdown-title" id={`${type}-title`}>{`${type==="app"?"+":":"} ${options[0]}`}</span>
           </div>
           <div class="dropdown-opt-list border border-top-0 border-dark">
-            {options.slice(1).map( (val,ind) => {
+            {options.slice(1).sort( (optA, optB) => {
+              if (optA < optB) return -1;
+              if (optA > optB) return 1;
+              return 0;
+            }).map( (val,ind) => {
               return (
                 <span class="h1 title my-0 mx-1 dropdown-opt" tabindex="0">{`- ${val}`}</span>
               )

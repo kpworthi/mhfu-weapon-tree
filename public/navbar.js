@@ -8,7 +8,7 @@ const NavBar = ({
     weapons: {
       title: "Weapons",
       location: "https://trees.nyralen.com",
-      subs: ["Sword and Shield", "Dual Blades", "Great Sword", "Long Sword", "Hunting Horn", "Hammer"]
+      subs: ["Sword and Shield", "Dual Blades", "Great Sword", "Long Sword", "Hunting Horn", "Hammer", "Gunlance", "Lance"]
     },
     kitchen: {
       title: "Kitchen",
@@ -52,8 +52,7 @@ const NavBar = ({
             options.unshift(tempSub);
           }
         }
-    }); //document.addEventListener('click', outsideClick);
-
+    });
     return /*#__PURE__*/React.createElement("div", {
       class: "dropdown-wrapper mx-1"
     }, /*#__PURE__*/React.createElement("div", {
@@ -68,7 +67,11 @@ const NavBar = ({
       id: `${type}-title`
     }, `${type === "app" ? "+" : ":"} ${options[0]}`)), /*#__PURE__*/React.createElement("div", {
       class: "dropdown-opt-list border border-top-0 border-dark"
-    }, options.slice(1).map((val, ind) => {
+    }, options.slice(1).sort((optA, optB) => {
+      if (optA < optB) return -1;
+      if (optA > optB) return 1;
+      return 0;
+    }).map((val, ind) => {
       return /*#__PURE__*/React.createElement("span", {
         class: "h1 title my-0 mx-1 dropdown-opt",
         tabindex: "0"

@@ -25,7 +25,7 @@ class Main extends React.Component {
     this.ctrlState = false;
     this.dragX = 0;
     this.dragY = 0;
-    this.sharpColors = ["red", "ora", "yel", "gre", "blu", "whi", "pur"];
+    this.wpnsWithExtra = [ 'hh', 'gl']
 
 
     // only load sns info to start, load rest after rendering
@@ -35,7 +35,9 @@ class Main extends React.Component {
       'great sword'  : ['', '', 'gs'],
       'long sword'   : ['', '', 'ls'],
       'hunting horn' : ['', '', 'hh'],
-      'hammer'       : ['', '', 'hm']
+      'hammer'       : ['', '', 'hm'],
+      'gunlance'     : ['', '', 'gl'],
+      'lance'        : ['', '', 'la']
     }
     this.weaponAlts  = { 
       'sword and shield': ['Dual Blades', 'db'], 
@@ -43,7 +45,9 @@ class Main extends React.Component {
       'great sword': ['Long Sword', 'ls'],
       'long sword' : ['Great Sword', 'gs'],
       'hunting horn': ['Hammer', 'hm'],
-      'hammer' : ['Hunting Horn', 'hh']
+      'hammer' : ['Hunting Horn', 'hh'],
+      'gunlance': ['Lance', 'la'],
+      'lance' : ['Gunlance', 'gl']
     }
 
     this.hhSongs = [
@@ -134,6 +138,16 @@ class Main extends React.Component {
         this.dataAndMaps['hammer'][0] = module.default;
         this.dataAndMaps['hammer'][1] = module.hmMap;
       });
+      import('./gl-bundle.js')
+        .then( module => {
+          this.dataAndMaps['gunlance'][0] = module.default;
+          this.dataAndMaps['gunlance'][1] = module.glMap;
+        });
+      import('./la-bundle.js')
+        .then( module => {
+          this.dataAndMaps['lance'][0] = module.default;
+          this.dataAndMaps['lance'][1] = module.laMap;
+        });
   }
 
   componentDidUpdate(){
@@ -199,6 +213,8 @@ class Main extends React.Component {
               <td class="list-header">Affinity</td>
               {this.state.subTitle !== "hunting horn"?null:
               <td class="list-header">Notes</td>}
+              {this.state.subTitle !== "gunlance"?null:
+              <td class="list-header">Shelling</td>}
               <td class="list-header">Sharpness</td>
               <td class="list-header">Slots</td>
               <td class="list-header">Defense</td>
@@ -216,6 +232,8 @@ class Main extends React.Component {
                   <td id={`${weapon.name.toLowerCase()}-affinity`} class="list-cell pr-2">{weapon.affinity}</td>
                   {weapon.type !== "hh"?null:
                   <td id={`${weapon.name.toLowerCase()}-notes`} class="list-cell pr-2">{this.buildNotesList(weapon.notes)}</td>}
+                  {weapon.type !== "gl"?null:
+                  <td id={`${weapon.name.toLowerCase()}-shelling`} class="list-cell pr-2">{weapon.shelling}</td>}
                   <td id={`${weapon.name.toLowerCase()}-sharpness`} class="list-cell pr-2">{this.buildPanelSharpness(weapon)}</td>
                   <td id={`${weapon.name.toLowerCase()}-slots`} class="list-cell pr-2">{weapon.slots}</td>
                   <td id={`${weapon.name.toLowerCase()}-defense`} class="list-cell pr-2">{weapon.bonus}</td>
@@ -674,7 +692,7 @@ class Main extends React.Component {
       <div class="note-wrapper">
         {noteArray.map( color => 
           <div class={`note-block${preview?"-empty":""} ${preview?"s":""} ${color.slice(0,3)} ml-1`} >
-            {preview?null:<img class="note" src="./public/note3.png" />}
+            {preview?null:<img class="note" src="./public/icons/note3.png" />}
           </div> )}
       </div>
     )
@@ -791,7 +809,7 @@ class Main extends React.Component {
           </div>
           :this.displayList()}
 
-          {/* Info Panel Start - A bit unwieldy now, to be separated later */}
+          {/* Info Panel Start - A bit unwieldy now, to be separated out of render later */}
 
           <div id="info-panel" class="pt-1 pb-3 col-md-4 col-lg-3">
             <h2 class="title">Info Panel</h2>
@@ -799,7 +817,7 @@ class Main extends React.Component {
             <table id="panel-main-table" class="panel-main-table ml-2">
               <thead><tr> <th id="panel-name" class="text-center" colspan="2">{selectedWeapon.name}</th> </tr></thead>
               <tbody>
-                {Object.keys(selectedWeapon).slice(1,selectedWeapon.type==="hh"?9:8).map( key => {
+                {Object.keys(selectedWeapon).slice(1,this.wpnsWithExtra.includes(selectedWeapon.type)?9:8).map( key => {
                   let title = key.split(''); title[0] = title[0].toUpperCase(); title = title.join('');
                   return (
                     <tr>
