@@ -22,8 +22,8 @@
   #info-panel{
     height: calc((100vh - 150px) / 3)!important;
   }
-  #sub-dropdown {
-    min-width: 150px!important;
+  #sub-dropdown, #app-dropdown {
+    min-width: 90vw!important;
   }
   #zoomInBtn { right: 130px!important; }
   #zoomOutBtn { right: 88px!important; }

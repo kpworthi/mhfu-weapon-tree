@@ -25,8 +25,7 @@ const NavBar = ({ title, subTitle, tagLine, changeState }) => {
   }
 
   let clickHandler = ( event ) => {
-    if ( event.target.className === 'dropdown-title') event.currentTarget.querySelector('.dropdown-opt-list').classList.add('drop-show');
-    else if ( event.target.className.includes('dropdown-opt') && event.currentTarget.id === 'app-dropdown' ) {
+    if ( event.target.className.includes('dropdown-opt') && event.currentTarget.id === 'app-dropdown' ) {
       let eventText = event.target.textContent.split('- ')[1];
       changeState({ 
         appTitle: eventText.toLowerCase(), 
@@ -40,6 +39,7 @@ const NavBar = ({ title, subTitle, tagLine, changeState }) => {
       changeState({ subTitle: eventText.toLowerCase() })
       document.querySelector('.drop-show').classList.remove('drop-show');
     }
+    else if ( event.currentTarget.className === 'nav-drop') event.currentTarget.querySelector('.dropdown-opt-list').classList.add('drop-show');
   }
 
   let buildDropdown = ( type ) => {
@@ -82,7 +82,7 @@ const NavBar = ({ title, subTitle, tagLine, changeState }) => {
     )
   }
 
-  window.addEventListener('click', function(e) { // collapse open nav dropdowns when clicking outside of them
+  window.addEventListener('click', (e) => { // collapse open nav dropdowns when clicking outside of them
     for (const select of document.querySelectorAll('.nav-drop')) {
         if (!select.contains(e.target)) {
             select.querySelector('.dropdown-opt-list').classList.remove('drop-show');

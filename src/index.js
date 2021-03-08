@@ -30,73 +30,17 @@ class Main extends React.Component {
 
     // only load sns info to start, load rest after rendering
     this.dataAndMaps = { 
-      'sword and shield': [snsData, snsMap, 'sns'], 
-      'dual blades'  : ['', '', 'db'],
-      'great sword'  : ['', '', 'gs'],
-      'long sword'   : ['', '', 'ls'],
-      'hunting horn' : ['', '', 'hh'],
-      'hammer'       : ['', '', 'hm'],
-      'gunlance'     : ['', '', 'gl'],
-      'lance'        : ['', '', 'la']
-    }
-    this.weaponAlts  = { 
-      'sword and shield': ['Dual Blades', 'db'], 
-      'dual blades': ['Sword and Shield', 'sns'],
-      'great sword': ['Long Sword', 'ls'],
-      'long sword' : ['Great Sword', 'gs'],
-      'hunting horn': ['Hammer', 'hm'],
-      'hammer' : ['Hunting Horn', 'hh'],
-      'gunlance': ['Lance', 'la'],
-      'lance' : ['Gunlance', 'gl']
+      'sword and shield': { data: snsData, map: snsMap, abbr: 'sns', alt: 'db', altFull: 'Dual Blades'},
+      'dual blades'  : { data: '', map: '', abbr: 'db', alt: 'sns', altFull: 'Sword and Shield'},
+      'great sword'  : { data: '', map: '', abbr: 'gs', alt: 'ls', altFull: 'Long Sword'},
+      'long sword'   : { data: '', map: '', abbr: 'ls', alt: 'gs', altFull: 'Great Sword'},
+      'hunting horn' : { data: '', map: '', abbr: 'hh', alt: 'hm', altFull: 'Hammer'},
+      'hammer'       : { data: '', map: '', abbr: 'hm', alt: 'hh', altFull: 'Hunting Horn'},
+      'gunlance'     : { data: '', map: '', abbr: 'gl', alt: 'la', altFull: 'Lance'},
+      'lance'        : { data: '', map: '', abbr: 'la', alt: 'gl', altFull: 'Gunlance'}
     }
 
-    this.hhSongs = [
-      ['Move Spd Up (Self)', 'ww'],
-      ['Move Spd Up (Self)', 'pp'],
-      ['Stagger Protection (Self)', 'ww'],
-      ['Stagger Protection (Self)', 'pp'],
-      ['Auto Detect', 'bba'],
-      ['Attack Up (Small)', 'wr'],
-      ['Attack Up (Large)', 'prr'],
-      ['Elemental Attack Up', 'ybyw'],
-      ['Supersonic Waves', 'yyy'],
-      ['Defense Up (Small)', 'ry'],
-      ['Defense Up (Large)', 'rgr'],
-      ['Divine Protection', 'gypy'],
-      ['Heal 20', 'pg'],
-      ['Heal 30', 'gpy'],
-      ['Heal 60', 'ggpa'],
-      ['Heal 20 w/ Antidote', 'wg'],
-      ['Heal 30 w/ Antidote', 'gbpb'],
-      ['Heal 30 w/ Deoderant', 'gwa'],
-      ['Max HP +20', 'rbw'],
-      ['Max HP +30', 'rra'],
-      ['Max HP +50', 'rbrp'],
-      ['Recovery Speed Up (Small)', 'ggy'],
-      ['Recovery Speed Up (Large)', 'grgp'],
-      ['Earplugs (Small)', 'aar'],
-      ['Earplugs (Large)', 'aagp'],
-      ['Stun Negated', 'abp'],
-      ['Cold and Freeze Negated', 'aay'],
-      ['Heat Negated', 'aga'],
-      ['Paralysis Negated', 'ayy'],
-      ['Tremors Negated', 'aya'],
-      ['Wind Resist (Small)', 'bbr'],
-      ['Wind Resist (Large)', 'bab'],
-      ['Wind Pressure Negated', 'bbyp'],
-      ['Infinite Stamina (Small)', 'wb'],
-      ['Infinite Stamina (Large)', 'pbb'],
-      ['Fire Resist (Small)', 'yr'],
-      ['Fire Resist (Large)', 'ybw'],
-      ['Water Resist (Small)', 'ybp'],
-      ['Water Resist (Large)', 'ybbw'],
-      ['Ice Resist (Small)', 'ywa'],
-      ['Ice Resist (Large)', 'ypa'],
-      ['Thunder Resist (Small)', 'yap'],
-      ['Thunder Resist (Large)', 'yyb'],
-      ['Dragon Resist (Small)', 'wy'],
-      ['Dragon Resist (Large)', 'pyy']
-    ]
+    this.hhSongs = []; // to be imported with rest of hh data
 
     this.changeState = ( stateObj ) => { this.setState(stateObj) }
 
@@ -115,38 +59,39 @@ class Main extends React.Component {
     document.onkeyup = this.keyHandler;
     import('./db-bundle.js')
       .then( module => {
-        this.dataAndMaps['dual blades'][0] = module.default;
-        this.dataAndMaps['dual blades'][1] = module.dbMap;
+        this.dataAndMaps['dual blades'].data = module.default;
+        this.dataAndMaps['dual blades'].map  = module.dbMap;
       });
     import('./gs-bundle.js')
       .then( module => {
-        this.dataAndMaps['great sword'][0] = module.default;
-        this.dataAndMaps['great sword'][1] = module.gsMap;
+        this.dataAndMaps['great sword'].data = module.default;
+        this.dataAndMaps['great sword'].map  = module.gsMap;
       });
     import('./ls-bundle.js')
       .then( module => {
-        this.dataAndMaps['long sword'][0] = module.default;
-        this.dataAndMaps['long sword'][1] = module.lsMap;
+        this.dataAndMaps['long sword'].data = module.default;
+        this.dataAndMaps['long sword'].map  = module.lsMap;
       });
     import('./hh-bundle.js')
       .then( module => {
-        this.dataAndMaps['hunting horn'][0] = module.default;
-        this.dataAndMaps['hunting horn'][1] = module.hhMap;
+        this.dataAndMaps['hunting horn'].data = module.default;
+        this.dataAndMaps['hunting horn'].map  = module.hhMap;
+        this.hhSongs                          = module.hhSongs;
       });
     import('./hm-bundle.js')
       .then( module => {
-        this.dataAndMaps['hammer'][0] = module.default;
-        this.dataAndMaps['hammer'][1] = module.hmMap;
+        this.dataAndMaps['hammer'].data = module.default;
+        this.dataAndMaps['hammer'].map  = module.hmMap;
       });
       import('./gl-bundle.js')
         .then( module => {
-          this.dataAndMaps['gunlance'][0] = module.default;
-          this.dataAndMaps['gunlance'][1] = module.glMap;
+          this.dataAndMaps['gunlance'].data = module.default;
+          this.dataAndMaps['gunlance'].map  = module.glMap;
         });
       import('./la-bundle.js')
         .then( module => {
-          this.dataAndMaps['lance'][0] = module.default;
-          this.dataAndMaps['lance'][1] = module.laMap;
+          this.dataAndMaps['lance'].data = module.default;
+          this.dataAndMaps['lance'].map  = module.laMap;
         });
   }
 
@@ -155,7 +100,7 @@ class Main extends React.Component {
     if ( this.state.mode === "tree" ){
       if ( document.querySelector('.active-border') )
         document.querySelectorAll('.active-border').forEach( border => border.classList.remove('active-border') );
-      if ( this.state.itemSelect && this.state.itemSelect.type == this.dataAndMaps[this.state.subTitle][2] ){
+      if ( this.state.itemSelect && this.state.itemSelect.type == this.dataAndMaps[this.state.subTitle].abbr ){
         // do border update only if there wasn't a manual tree switch  
         if ( this.state.itemSelect && document.getElementById(this.state.itemSelectBorder)   ){
           let newBorder = document.getElementById(this.state.itemSelectBorder);
@@ -172,7 +117,7 @@ class Main extends React.Component {
 
   displayList () {
     let sortKey = this.state.listSortBy;
-    let theList = this.dataAndMaps[this.state.subTitle.toLowerCase()][0].sort((a,b) => {
+    let theList = this.dataAndMaps[this.state.subTitle.toLowerCase()].data.sort((a,b) => {
       let valueA = 0;
       let valueB = 0;
       if ( this.state.listSortOrder === "asc"){
@@ -264,8 +209,8 @@ class Main extends React.Component {
     const rarity = ["white","#ececec","#b2c06a","#5f9757","#83b1bc","#6864b7","#8867c4","#b7846a","#dc5052","#8cb7e1"];
     let rightMax = 0; // track position of right-most element
     let bottomMax = 0; // track position of bottom-most element
-    const currMap = this.dataAndMaps[this.state.subTitle][1];
-    const currData = this.dataAndMaps[this.state.subTitle][0];
+    const currMap = this.dataAndMaps[this.state.subTitle].map;
+    const currData = this.dataAndMaps[this.state.subTitle].data;
     
     // modify grid based on currently collapsed trees
     let newGrid = currMap;
@@ -296,7 +241,7 @@ class Main extends React.Component {
     newGrid.forEach( (row, y) => {
       // determine row name
       let rowName = row[0];
-      if ( rowName.includes(this.weaponAlts[this.state.subTitle][1]) ) rowName = row[1];
+      if ( rowName.includes(this.dataAndMaps[this.state.subTitle].alt) ) rowName = row[1];
       let currCollapsed = this.state.collapsedTrees;
       if (rowName !== "" && rowName !== "+"){
         theTree.push(
@@ -390,6 +335,9 @@ class Main extends React.Component {
         // paint the item boxes and paste relevant icons
         let weapon  = currData[currData.findIndex(val=>val.name===cell)];
         let itemMod = `x${x}y${y}` // unique identifier for each border & icon
+        let sub = this.state.subTitle;
+        let curAbbr = this.dataAndMaps[sub].abbr;
+        let altAbbr = this.dataAndMaps[sub].alt;
         if (cell !== "" && cell !== "+") {
           // border
           theTree.push(
@@ -401,20 +349,19 @@ class Main extends React.Component {
                   x={paddingX + boxSpaceX*x}
                   y={paddingY + boxSpaceY*y}
                   stroke="black" 
-                  fill={cell.includes(this.weaponAlts[this.state.subTitle][1])?"white":rarity[weapon.rarity-1]}>
+                  fill={cell.includes(`(${altAbbr})`)?"white":rarity[weapon.rarity-1]}>
             </rect>);
           
           if ( paddingX + boxSpaceX*x > rightMax ) rightMax = paddingX + boxSpaceX*x;
           if ( paddingY + boxSpaceY*y > bottomMax) bottomMax = paddingY + boxSpaceY*y;
 
-          let sub = this.state.subTitle;
           // weapon icon
           theTree.push(
-            <image id={`${cell.includes(this.weaponAlts[sub][1])?this.weaponAlts[sub][1]:this.dataAndMaps[sub][2]}icon-${itemMod}`}
+            <image id={`${cell.includes(`(${altAbbr})`)?altAbbr:curAbbr}icon-${itemMod}`}
                    class="main-icon"
                    data-weapon={`${cell}`}
-                   href={cell.includes(this.weaponAlts[sub][1])?`./public/icons/${this.weaponAlts[sub][1]}.png`:
-                                                                `./public/icons/${this.dataAndMaps[sub][2]}.png`}
+                   href={cell.includes(`(${altAbbr})`)?`./public/icons/${altAbbr}.png`:
+                                                       `./public/icons/${curAbbr}.png`}
                    x={paddingX + boxSpaceX*x}
                    y={paddingY + boxSpaceY*y}
                    width={boxWidth}
@@ -489,7 +436,7 @@ class Main extends React.Component {
     // handle click on list item (not tree link)
     else if ( event.currentTarget.id.endsWith('row') ) {
       this.setState({
-        itemSelect: this.dataAndMaps[this.state.subTitle][0].find(weapon => weapon.name.toLowerCase()===event.currentTarget.id.split('-row')[0])
+        itemSelect: this.dataAndMaps[this.state.subTitle].data.find(weapon => weapon.name.toLowerCase()===event.currentTarget.id.split('-row')[0])
       });
     }
     // handle click on list tree link
@@ -498,11 +445,11 @@ class Main extends React.Component {
       this.btnListTreeLink( event.currentTarget.id );
     }
     // handle clicking on current tree's icons
-    else if ( event.target.id.startsWith(`${this.dataAndMaps[this.state.subTitle][2]}icon`) ) {
+    else if ( event.target.id.startsWith(`${this.dataAndMaps[this.state.subTitle].abbr}icon`) ) {
       this.btnTreeIcon( event.target.dataset.weapon, `border-${event.target.id.split('-')[1]}` );
     }
     // handle clicking on alternate tree's icons
-    else if ( event.target.id.startsWith(`${this.weaponAlts[this.state.subTitle][1]}icon`) ) {
+    else if ( event.target.id.startsWith(`${this.dataAndMaps[this.state.subTitle].alt}icon`) ) {
       this.btnTreeAltIcon( event.target.dataset.weapon.split(' (')[0], event.target.id.split('-')[1] );
     }
     // handle collapsing of trees
@@ -563,7 +510,7 @@ class Main extends React.Component {
 
   btnListTreeLink ( eventCurrTgtId ) {
     this.setState({
-      itemSelect: this.dataAndMaps[this.state.subTitle][0].find(weapon => weapon.name.toLowerCase() === eventCurrTgtId.split('-tree')[0]),
+      itemSelect: this.dataAndMaps[this.state.subTitle].data.find(weapon => weapon.name.toLowerCase() === eventCurrTgtId.split('-tree')[0]),
       mode: 'tree'
     }, () => {
       let borders = Array.from(document.querySelectorAll('.icon-border'))
@@ -578,7 +525,7 @@ class Main extends React.Component {
 
   btnTreeIcon ( weaponName, borderName ) {
     this.setState({
-      itemSelect: this.dataAndMaps[this.state.subTitle][0].find( val => val.name === weaponName ),
+      itemSelect: this.dataAndMaps[this.state.subTitle].data.find( val => val.name === weaponName ),
       itemSelectBorder: borderName
     })
     if ( document.querySelector('.active-border') )
@@ -587,9 +534,10 @@ class Main extends React.Component {
   }
 
   btnTreeAltIcon ( weaponName, iconPos ) {
+    let weaponTypeFull = this.dataAndMaps[this.state.subTitle].altFull.toLowerCase();
     this.setState({
-      subTitle: this.weaponAlts[this.state.subTitle][0].toLowerCase(),
-      itemSelect: this.dataAndMaps[this.weaponAlts[this.state.subTitle][0].toLowerCase()][0].find( val => val.name === weaponName ),
+      subTitle: weaponTypeFull,
+      itemSelect: this.dataAndMaps[weaponTypeFull].data.find( val => val.name === weaponName ),
       itemSelectBorder: ''
     }, ()=>{
       if ( document.querySelector('.active-border') )
@@ -610,7 +558,7 @@ class Main extends React.Component {
         if ( weapon["upgrade-from"].length != 2 ) { // if not equal to two, it's not an array.
           prevWeapon = weapon["upgrade-from"];
         } else { //otherwise, it's an array
-          prevWeapon = weapon["upgrade-from"].filter( oldWeapon => this.dataAndMaps[this.state.subTitle][0].find(val=>val.name===oldWeapon)===undefined)[0];
+          prevWeapon = weapon["upgrade-from"].filter( oldWeapon => this.dataAndMaps[this.state.subTitle].data.find(val=>val.name===oldWeapon)===undefined)[0];
         }
         document.querySelectorAll('.main-icon').forEach( icon => icon.dataset.weapon.startsWith(prevWeapon)?prevWeaponIcon=icon:null)
         newBorder = prevWeaponIcon.nextElementSibling;
@@ -722,8 +670,8 @@ class Main extends React.Component {
     let tooltip = document.querySelector("#tooltip");
     let htmlEl = document.querySelector("html");
     let mouseLoc = [event.pageX, event.pageY];  
-    let currData = this.dataAndMaps[this.state.subTitle][0]
-    let altData  = this.dataAndMaps[this.weaponAlts[this.state.subTitle][0].toLowerCase()][0]
+    let currData = this.dataAndMaps[this.state.subTitle].data
+    let altData  = this.dataAndMaps[this.dataAndMaps[this.state.subTitle].altFull.toLowerCase()].data
     let weapon = currData.find( val=>val.name===event.target.dataset.weapon );
     if (weapon === undefined) weapon = altData.find( val=>val.name===event.target.dataset.weapon.split(' (')[0] );
 
@@ -747,13 +695,13 @@ class Main extends React.Component {
   tooltip () {
     let selected = this.state.itemSelect; // is there an item selected? if yes, what is it
     let hoverItem = this.state.itemHover; // is there an item being hovered? if yes, what is it
-    let altType = hoverItem.type===this.weaponAlts[this.state.subTitle][1]; // is the hover item's type not the current branches' type?
+    let altType = hoverItem.type===this.dataAndMaps[this.state.subTitle].alt; // is the hover item's type not the current branches' type?
     let compare = this.state.ctrlState && selected.type===hoverItem.type && hoverItem.name !== selected.name; // is ctrl being held, are the types the same, and are the items different?
     return (
       <table id="tooltip" class="tooltip">
         <thead>
           <tr>
-            <th id="tool-name" colspan="2">{!hoverItem?"*":hoverItem.name+(altType?` (${this.weaponAlts[this.state.subTitle][0]})`:"")}</th>
+            <th id="tool-name" colspan="2">{!hoverItem?"*":hoverItem.name+(altType?` (${this.dataAndMaps[this.state.subTitle].altFull})`:"")}</th>
             <th id="compare-name" colspan="1">{compare?selected.name:null}</th>
           </tr>
         </thead>
