@@ -5,7 +5,7 @@
 }
 @media (max-width: 400px) {
   :root {
-    font-size: 12px;
+    font-size: 12px!important;
   }
   .tag-line {
     display: none;
@@ -31,7 +31,7 @@
 }
 @media (min-width: 401px) and (max-width: 767px) {
   :root {
-    font-size: 14px;
+    font-size: 14px!important;
   }
   .tag-line {
     display: none;
@@ -53,10 +53,15 @@
   #modeBtn { right: 30px!important; }
 }
 
+:root {
+  font-size: 16px;
+}
+
 body {
   height: 100vh;
+  margin: 0;
   overflow: hidden;
-  background-color: rgb(183, 232, 226);
+  background-color: rgb(183, 232, 226)!important;
 }
 
 * {
@@ -80,10 +85,10 @@ body {
 
 /* NavBar styles */
 
-#temp-wrapper { padding: 0 15px;}
 #nav-bar{
   margin-top: 10px;
   background-color: lightcyan;
+  border: 1px solid #343a40;
 }
 
 .dropdown-wrapper {
@@ -98,7 +103,7 @@ body {
 }
 
 #sub-dropdown {
-  min-width: 333px;
+  min-width: 405px;
 }
 
 .dropdown-curr { 
@@ -132,7 +137,7 @@ body {
 .dropdown-opt {
   position: relative;
   display: block;
-  font-size: 2rem;
+  font-size: 2rem!important;
   padding: 0 20px;
   color: #3b3b3b;
   background-color: lightcyan;
@@ -163,7 +168,7 @@ body {
   border: 1px solid black;
   background-color: rgb(183, 232, 226);
   background-image: linear-gradient(rgba(183, 232, 226, 0.95), rgba(183, 232, 226, 0.95)),
-                    url('./icons/sns.png')
+                    url('../ico/sns.png')
 }
 
 /* List Definitions */
@@ -175,7 +180,7 @@ body {
   border: 1px solid black;
   background-color: rgb(183, 232, 226);
   background-image: linear-gradient(rgba(183, 232, 226, 0.95), rgba(183, 232, 226, 0.95)),
-                    url('./icons/sns.png')
+                    url('../ico/sns.png')
 }
 
 #list-container table {
@@ -374,5 +379,25 @@ body {
 
 .sh-dbl { border-left: 0px!important; }
 
+#temp-wrapper { padding: 0 15px;}
+.starter-nav {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+}
 
+#starter-title {
+  margin-top: 0;
+  margin-bottom: .5rem;
+  font-size: 2.5rem;
+  font-weight: 500;
+  line-height: 1.2;
+  color: #3b3b3b;
+}
+
+#starter-row {
+  display:flex;
+}
 

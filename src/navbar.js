@@ -1,5 +1,7 @@
+import React from 'react';
+
 const NavBar = ({ title, subTitle, tagLine, changeState }) => {
-  let apps = { 
+  const apps = { 
     weapons: { 
       title: "Weapons", 
       location: "https://trees.nyralen.com", 
@@ -24,7 +26,7 @@ const NavBar = ({ title, subTitle, tagLine, changeState }) => {
     }
   }
 
-  let clickHandler = ( event ) => {
+  const clickHandler = ( event ) => {
     if ( event.target.className.includes('dropdown-opt') && event.currentTarget.id === 'app-dropdown' ) {
       let eventText = event.target.textContent.split('- ')[1];
       changeState({ 
@@ -42,7 +44,7 @@ const NavBar = ({ title, subTitle, tagLine, changeState }) => {
     else if ( event.currentTarget.className === 'nav-drop') event.currentTarget.querySelector('.dropdown-opt-list').classList.add('drop-show');
   }
 
-  let buildDropdown = ( type ) => {
+  const buildDropdown = ( type ) => {
     let options = [];
     let currentApp = title;
     let currentSub = subTitle;

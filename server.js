@@ -23,13 +23,16 @@ app.use(function (req, res, next){
 });
 
 // public folder
-app.use('/public', express.static(process.cwd() + '/public'));
+app.use('/dist', express.static(process.cwd() + '/dist'));
+
+// icons folder
+app.use('/ico', express.static(process.cwd() + '/ico'));
 
 // index page
 app.route('/')
   .get(function (req, res) {
     console.log(`Landing page GET @ ${currentTimeEST()}`);
-    res.sendFile(process.cwd() + '/public/index.html');
+    res.sendFile(process.cwd() + '/dist/index.html');
   });
   
 // favicon
