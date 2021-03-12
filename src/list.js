@@ -43,12 +43,13 @@ const List = ({changeState, sortParam, sortOrder, currData, currWeaponName, subT
   }
 
   const btnListTreeLink = ( eventCurrTgtId ) => {
+    const clickedWeapon = eventCurrTgtId.split('-tree')[0]
     changeState({
-      itemSelect: currData.data.find(weapon => weapon.name.toLowerCase() === eventCurrTgtId.split('-tree')[0]),
+      itemSelect: currData.data.find(weapon => weapon.name.toLowerCase() === clickedWeapon),
       mode: 'tree'
     }, () => {
       let borders = Array.from(document.querySelectorAll('.icon-border'))
-      let newBorder = borders.find( border => border.dataset.weapon.startsWith( currWeaponName ))
+      let newBorder = borders.find( border => border.dataset.weapon.toLowerCase().startsWith( clickedWeapon ))
       let newScrollHeight = Math.floor(newBorder.y.baseVal.value)-document.querySelector('#svg-overflow-wrapper').offsetHeight/2;
       document.querySelector('#svg-overflow-wrapper').scrollTop = newScrollHeight;
       let newScrollWidth = Math.floor(newBorder.x.baseVal.value)-document.querySelector('#svg-overflow-wrapper').offsetWidth/2;

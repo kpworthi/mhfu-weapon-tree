@@ -50,7 +50,7 @@ class Main extends React.Component {
 
     this.hhSongs = []; // to be imported with rest of hh data
 
-    this.changeState = ( stateObj ) => { this.setState(stateObj) }
+    this.changeState = ( stateObj, callback ) => { this.setState(stateObj, callback) }
 
     this.buildPanelSharpness = this.buildPanelSharpness.bind(this);
     this.clickHandler = this.clickHandler.bind(this);
