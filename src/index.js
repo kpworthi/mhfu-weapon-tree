@@ -33,7 +33,6 @@ class Main extends React.Component {
     this.ctrlState = false;
     this.dragX = 0;
     this.dragY = 0;
-    this.wpnsWithExtra = [ 'hh', 'gl']
 
 
     // only load sns info to start, load rest after rendering
@@ -45,14 +44,15 @@ class Main extends React.Component {
       'hunting horn' : { data: '', map: '', abbr: 'hh', alt: 'hm', altFull: 'Hammer', icon: './icons/hh.png'},
       'hammer'       : { data: '', map: '', abbr: 'hm', alt: 'hh', altFull: 'Hunting Horn', icon: './icons/hm.png'},
       'gunlance'     : { data: '', map: '', abbr: 'gl', alt: 'la', altFull: 'Lance', icon: './icons/gl.png'},
-      'lance'        : { data: '', map: '', abbr: 'la', alt: 'gl', altFull: 'Gunlance', icon: './icons/la.png'}
+      'lance'        : { data: '', map: '', abbr: 'la', alt: 'gl', altFull: 'Gunlance', icon: './icons/la.png'},
+      'bow'          : { data: '', map: '', abbr: 'bow', alt: '', altFull: '', icon: './icons/bow.png'}
     }
 
     this.hhSongs = []; // to be imported with rest of hh data
 
     this.changeState = ( stateObj, callback ) => { this.setState(stateObj, callback) }
 
-    this.buildPanelSharpness = this.buildPanelSharpness.bind(this);
+    this.buildSharpness = this.buildSharpness.bind(this);
     this.clickHandler = this.clickHandler.bind(this);
     this.dragHandler   = this.dragHandler.bind(this);
     this.keyHandler    = this.keyHandler.bind(this);
@@ -98,6 +98,13 @@ class Main extends React.Component {
           this.dataAndMaps['lance'].data = module.default;
           this.dataAndMaps['lance'].map  = module.laMap;
         });
+      /*
+      import('./bow-bundle.js')
+        .then( module => {
+          this.dataAndMaps['bow'].data = module.default;
+          this.dataAndMaps['bow'].map  = module.bowMap;
+        });
+      */
   }
 
   componentDidUpdate(){
@@ -192,7 +199,7 @@ class Main extends React.Component {
     )
   }
 
-  buildPanelSharpness ( weapon ) {
+  buildSharpness ( weapon ) {
     let sharpness = [];
     let sharpString = weapon.sharpness;
     for (let i=0; i<sharpString.length; i+=4) {
@@ -213,10 +220,11 @@ class Main extends React.Component {
   }
 
   tooltip () {
-    let selected = this.state.itemSelect; // is there an item selected? if yes, what is it
-    let hoverItem = this.state.itemHover; // is there an item being hovered? if yes, what is it
-    let altType = hoverItem.type===this.dataAndMaps[this.state.subTitle].alt; // is the hover item's type not the current branches' type?
-    let compare = this.state.ctrlState && selected.type===hoverItem.type && hoverItem.name !== selected.name; // is ctrl being held, are the types the same, and are the items different?
+    const selected = this.state.itemSelect; // is there an item selected? if yes, what is it
+    const hoverItem = this.state.itemHover; // is there an item being hovered? if yes, what is it
+    const altType = hoverItem.type===this.dataAndMaps[this.state.subTitle].alt; // is the hover item's type not the current branches' type?
+    const compare = this.state.ctrlState && selected.type===hoverItem.type && hoverItem.name !== selected.name; // is ctrl being held, are the types the same, and are the items different?
+    const isRanged = hoverItem?["bow","hbg","lbg"].includes(hoverItem.type):false;
     return (
       <table id="tooltip" class="tooltip">
         <thead>
@@ -239,12 +247,12 @@ class Main extends React.Component {
           <tr>
             <td><b>{!hoverItem||altType?null:"Sharpness"}</b></td>
             <td id="tool-sharp">
-              {!hoverItem||altType?null:this.buildPanelSharpness(hoverItem)}
+              {!hoverItem||altType||isRanged?null:this.buildSharpness(hoverItem)}
             </td>
           </tr><tr>
             <td />
             <td id="compare-sharp">
-              {compare&&selected?this.buildPanelSharpness( this.state.itemSelect ):selected&&!altType&&hoverItem.name!==selected.name?"Compare with 'ctrl' ":null}
+              {compare&&selected?this.buildSharpness( this.state.itemSelect ):selected&&!altType&&hoverItem.name!==selected.name?"Compare with 'ctrl' ":null}
             </td>
           </tr>
         </tbody>
@@ -256,17 +264,15 @@ class Main extends React.Component {
     let selectedWeapon = this.state.itemSelect;
     let title = this.state.appTitle;
     let subTitle = this.state.subTitle;
-    let noteArray = [];
-    if (selectedWeapon && selectedWeapon.type==="hh"){
-      noteArray = selectedWeapon.notes.match(/\.[a-z]+/g).map( newNote => newNote.slice(1,2) )
-    }
     return(
       <div id="app-wrapper" class="container-fluid d-flex flex-column" >
         <NavBar title={title} subTitle={subTitle} tagLine={this.state.tagLine} changeState={this.changeState}/>
         <div id="main-app-row" class="row m-0">
+
           {this.state.mode==="tree"?<div id="zoomInBtn" onClick={this.clickHandler}>+</div>:null}
           {this.state.mode==="tree"?<div id="zoomOutBtn" onClick={this.clickHandler}>-</div>:null}
           <div id="modeBtn" onClick={this.clickHandler} class="d-flex justify-content-center align-items-center">{this.state.mode==='tree'?"List":"Tree"}</div>
+
           {this.state.mode==="tree"?
           <div id="svg-overflow-wrapper" 
                class="col-md-8 col-lg-9"
@@ -293,99 +299,12 @@ class Main extends React.Component {
                  subTitle={this.state.subTitle}
           />}
 
-          {/* Info Panel Start - A bit unwieldy now, to be separated out of render later */}
+          <Panel selectedWeapon={selectedWeapon} 
+                 buildSharpness={this.buildSharpness}
+                 buildNotesList={this.buildNotesList}
+                 hhSongs={this.hhSongs}
+          />
 
-          <div id="info-panel" class="pt-1 pb-3 col-md-4 col-lg-3">
-            <h2 class="title">Info Panel</h2>
-            {selectedWeapon===""?null:(
-            <table id="panel-main-table" class="panel-main-table ml-2">
-              <thead><tr> <th id="panel-name" class="text-center" colspan="2">{selectedWeapon.name}</th> </tr></thead>
-              <tbody>
-                {Object.keys(selectedWeapon).slice(1,this.wpnsWithExtra.includes(selectedWeapon.type)?9:8).map( key => {
-                  let title = key.split(''); title[0] = title[0].toUpperCase(); title = title.join('');
-                  return (
-                    <tr>
-                      <td class="px-1"><b>{title=="Bonus"?"Defense Bonus":title}</b></td>
-                      <td id={`panel-${key}`} class="px-1">
-                        {key=="sharpness"?this.buildPanelSharpness(this.state.itemSelect):
-                                          key==="notes"?this.buildNotesList(selectedWeapon.notes, false):selectedWeapon[key]}
-                      </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-            )}
-            {/* Song List */
-            selectedWeapon===""||selectedWeapon.type!=="hh"?null:(
-            <table id="panel-song-list" class="panel-song-list ml-2">
-              <thead>
-                <tr>
-                  <th id="panel-name" class="text-center" colspan="2">Song List</th>
-                </tr>
-              </thead>
-              <tbody>
-                {this.hhSongs
-                  .filter( song => {
-                    if ( song[1].split('').every( color => noteArray.includes(color) ) ) return true;
-                    else return false;
-                  }).map( validSong => (
-                    <tr class="valid-song-row">
-                      <td class="valid-song-notes pl-2">{this.buildNotesList("."+validSong[1].split('').join('.'), false)}</td>
-                      <td class="valid-song-name pl-2">{validSong[0]}</td>
-                    </tr>
-                  )
-                )}
-              </tbody>
-            </table>
-            )}
-            {/* Creation Table */
-            selectedWeapon===""?null:(
-            <table id="panel-create-table" class="panel-create-table ml-2">
-              <thead>
-                <tr>
-                  <th id="panel-name" class="text-center" colspan="2">From Scratch</th>
-                </tr>
-              </thead>
-              <tbody>
-                {selectedWeapon["create-cost"]!=="N/A"?Object.keys(selectedWeapon).filter(val=>val.startsWith('create')).map( key => {
-                  let title = key.split(''); title[0] = title[0].toUpperCase(); title = title.join('').split('-').join(' ');
-                  return (
-                    <tr>
-                      <td class="px-1"><b>{title}</b></td>
-                      {typeof selectedWeapon[key]==="object"?
-                      <td id={`panel-${key}`} class="px-1">{selectedWeapon[key].map(val=><p class="m-0 p-0">{val}</p>)}</td>:
-                      <td id={`panel-${key}`} class="px-1">{selectedWeapon[key]}</td>}
-                    </tr>
-                  )
-                }):<tr><td class="cell-type-unavail">This weapon cannot be created from scratch.</td></tr>}
-              </tbody>
-            </table>
-            )}
-            {/* Upgrade Table */
-            selectedWeapon===""?null:(
-            <table id="panel-upgrade-table" class="panel-upgrade-table ml-2 mb-3">
-              <thead>
-                <tr>
-                  <th id="panel-name" class="text-center" colspan="2">Upgrade</th>
-                </tr>
-              </thead>
-              <tbody>
-                {Object.keys(selectedWeapon).filter(val=>val.startsWith('upgrade')).map( key => {
-                  let title = key.split(''); title[0] = title[0].toUpperCase(); title = title.join('').split('-').join(' ');
-                  return (
-                    <tr>
-                      <td class="px-1"><b>{title}</b></td>
-                      {typeof selectedWeapon[key]==="object"?
-                      <td id={`panel-${key}`} class="px-1">{selectedWeapon[key].map(val=><p class="m-0 p-0">{val}</p>)}</td>:
-                      <td id={`panel-${key}`} class="px-1">{selectedWeapon[key]}</td>}
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-            )}
-          </div>
         </div>
 
         {this.tooltip()}
@@ -393,6 +312,110 @@ class Main extends React.Component {
       </div>
     )
   }
+}
+
+function Panel ( {selectedWeapon, buildSharpness, buildNotesList, hhSongs} ) {
+
+  let wpnsWithExtra = [ 'hh', 'gl']
+  let noteArray = [];
+  if (selectedWeapon && selectedWeapon.type==="hh"){
+    noteArray = selectedWeapon.notes.match(/\.[a-z]+/g).map( newNote => newNote.slice(1,2) )
+  }
+
+  return (
+    <div id="info-panel" class="pt-1 pb-3 col-md-4 col-lg-3">
+      <h2 class="title">Info Panel</h2>
+      {/* Main Table */
+      selectedWeapon===""?null:(
+      <table id="panel-main-table" class="panel-main-table ml-2">
+        <thead><tr> <th id="panel-weapon-name" class="text-center" colspan="2">{selectedWeapon.name}</th> </tr></thead>
+        <tbody>
+          {Object.keys(selectedWeapon).slice(1,wpnsWithExtra.includes(selectedWeapon.type)?9:8).map( key => {
+            let title = key.split(''); title[0] = title[0].toUpperCase(); title = title.join('');
+            return (
+              <tr>
+                <td class="px-1"><b>{title=="Bonus"?"Defense Bonus":title}</b></td>
+                <td id={`panel-${key}`} class="px-1">
+                  {key=="sharpness"?buildSharpness(selectedWeapon):
+                                    key==="notes"?buildNotesList(selectedWeapon.notes, false):selectedWeapon[key]}
+                </td>
+              </tr>
+            )
+          })}
+        </tbody>
+      </table>
+      )}
+      {/* Song List */
+      selectedWeapon===""||selectedWeapon.type!=="hh"?null:(
+      <table id="panel-song-list" class="panel-song-list ml-2">
+        <thead>
+          <tr>
+            <th id="panel-song-name" class="text-center" colspan="2">Song List</th>
+          </tr>
+        </thead>
+        <tbody>
+          {hhSongs
+            .filter( song => {
+              if ( song[1].split('').every( color => noteArray.includes(color) ) ) return true;
+              else return false;
+            }).map( validSong => (
+              <tr class="valid-song-row">
+                <td class="valid-song-notes pl-2">{buildNotesList("."+validSong[1].split('').join('.'), false)}</td>
+                <td class="valid-song-name pl-2">{validSong[0]}</td>
+              </tr>
+            )
+          )}
+        </tbody>
+      </table>
+      )}
+      {/* Creation Table */
+      selectedWeapon===""?null:(
+      <table id="panel-create-table" class="panel-create-table ml-2">
+        <thead>
+          <tr>
+            <th id="panel-create-name" class="text-center" colspan="2">From Scratch</th>
+          </tr>
+        </thead>
+        <tbody>
+          {selectedWeapon["create-cost"]!=="N/A"?Object.keys(selectedWeapon).filter(val=>val.startsWith('create')).map( key => {
+            let title = key.split(''); title[0] = title[0].toUpperCase(); title = title.join('').split('-').join(' ');
+            return (
+              <tr>
+                <td class="px-1"><b>{title}</b></td>
+                {typeof selectedWeapon[key]==="object"?
+                <td id={`panel-${key}`} class="px-1">{selectedWeapon[key].map(val=><p class="m-0 p-0">{val}</p>)}</td>:
+                <td id={`panel-${key}`} class="px-1">{selectedWeapon[key]}</td>}
+              </tr>
+            )
+          }):<tr><td class="cell-type-unavail">This weapon cannot be created from scratch.</td></tr>}
+        </tbody>
+      </table>
+      )}
+      {/* Upgrade Table */
+      selectedWeapon===""?null:(
+      <table id="panel-upgrade-table" class="panel-upgrade-table ml-2 mb-3">
+        <thead>
+          <tr>
+            <th id="panel-upgrade-name" class="text-center" colspan="2">Upgrade</th>
+          </tr>
+        </thead>
+        <tbody>
+          {Object.keys(selectedWeapon).filter(val=>val.startsWith('upgrade')).map( key => {
+            let title = key.split(''); title[0] = title[0].toUpperCase(); title = title.join('').split('-').join(' ');
+            return (
+              <tr>
+                <td class="px-1"><b>{title}</b></td>
+                {typeof selectedWeapon[key]==="object"?
+                <td id={`panel-${key}`} class="px-1">{selectedWeapon[key].map(val=><p class="m-0 p-0">{val}</p>)}</td>:
+                <td id={`panel-${key}`} class="px-1">{selectedWeapon[key]}</td>}
+              </tr>
+            )
+          })}
+        </tbody>
+      </table>
+      )}
+    </div>
+  )
 }
 
 ReactDOM.render(<Main />, document.querySelector("body"));

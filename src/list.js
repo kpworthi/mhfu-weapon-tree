@@ -132,7 +132,7 @@ const List = ({changeState, sortParam, sortOrder, currData, currWeaponName, subT
             <td class="list-header">Notes</td>}
             {subTitle !== "gunlance"?null:
             <td class="list-header">Shelling</td>}
-            <td class="list-header">Sharpness</td>
+            <td class="list-header">{["bow", "hbg", "lbg"].includes(currData.abbr)?"Coatings":"Sharpness"}</td>
             <td class="list-header">Slots</td>
             <td class="list-header">Defense</td>
             <td class="list-header">Rarity</td>
@@ -154,7 +154,8 @@ const List = ({changeState, sortParam, sortOrder, currData, currWeaponName, subT
                 <td id={`${weapon.name.toLowerCase()}-notes`} class="list-cell pr-2">{buildNotesPreview(weapon.notes)}</td>}
                 {weapon.type !== "gl"?null:
                 <td id={`${weapon.name.toLowerCase()}-shelling`} class="list-cell pr-2">{weapon.shelling}</td>}
-                <td id={`${weapon.name.toLowerCase()}-sharpness`} class="list-cell pr-2">{buildSharpness(weapon.sharpness)}</td>
+                {["bow", "hbg", "lbg"].includes(weapon.type)?<td id={`${weapon.name.toLowerCase()}-sharpness`} class="list-cell pr-2" />:
+                <td id={`${weapon.name.toLowerCase()}-sharpness`} class="list-cell pr-2">{buildSharpness(weapon.sharpness)}</td>}
                 <td id={`${weapon.name.toLowerCase()}-slots`} class="list-cell pr-2">{weapon.slots}</td>
                 <td id={`${weapon.name.toLowerCase()}-defense`} class="list-cell pr-2">{weapon.bonus}</td>
                 <td id={`${weapon.name.toLowerCase()}-rarity`} class="list-cell pr-2">{weapon.rarity}</td>

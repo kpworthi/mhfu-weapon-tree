@@ -29,27 +29,27 @@ const Tree = ({changeState, zoom, oldZoom, currInfo, altInfo, currWeapon, collap
 
   const btnTreeAltIcon = ( weaponName, iconPos ) => {
     let weaponTypeFull = currInfo.altFull.toLowerCase();
+    let newWeapon = altInfo.data.find( val => val.name === weaponName );
     changeState({
       subTitle: weaponTypeFull,
-      itemSelect: altInfo.data.find( val => val.name === weaponName ),
+      itemSelect: newWeapon,
       itemSelectBorder: ''
     }, ()=>{
       if ( document.querySelector('.active-border') )
         document.querySelector('.active-border').classList.remove('active-border');
       
       // find the new border
-      let weapon = currWeapon
+      let weapon = newWeapon;
       let newBorder = '';
       let prevWeapon = '';
       let prevWeaponIcon = '';
       if ( iconPos.startsWith('x0') ) { // the icon was the start of the other tree's branch
-        console.log(iconPos);
         let borders = Array.from(document.querySelectorAll('.icon-border'));
-        newBorder = borders.find( border => border.dataset.weapon.startsWith(currWeapon.name));
+        newBorder = borders.find( border => border.dataset.weapon.startsWith(newWeapon.name));
         changeState({ itemSelectBorder: newBorder.id })
       }
       else {
-        if ( weapon["upgrade-from"].length != 2 ) { // if not equal to two, it's not an array.
+        if ( typeof weapon["upgrade-from"] == "string" ) { // scraped as a string
           prevWeapon = weapon["upgrade-from"];
         } else { //otherwise, it's an array
           prevWeapon = weapon["upgrade-from"].filter( oldWeapon => currInfo.data.find(val=>val.name===oldWeapon)===undefined)[0];
