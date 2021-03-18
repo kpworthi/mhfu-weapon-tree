@@ -265,9 +265,9 @@ body {
   pointer-events: none;
 }
 
-.compare { display: none; }
-.show { display: table-cell; }
-
+#tooltip td, #tooltip th {
+  padding: 0 0.25rem;
+}
 
 .tree-title-closed, .tree-title-open {
   cursor: pointer;
@@ -313,6 +313,19 @@ body {
   width: 100%;
   border: 1px solid black;
 }
+
+/* Coating Classes */
+.coating-icon {
+  height: 16px;
+  width: 16px;
+}
+
+.cre { background-color: red }
+.cwh { background-color: white }
+.cpu { background-color: thistle }
+.cye { background-color: yellow }
+.caq { background-color: aqua }
+.cpi { background-color: pink }
 
 /* Note Classes */
 

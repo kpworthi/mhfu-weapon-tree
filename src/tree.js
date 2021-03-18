@@ -19,51 +19,38 @@ const Tree = ({changeState, zoom, oldZoom, currInfo, altInfo, currWeapon, collap
 
   const btnTreeIcon = ( weaponName, borderName ) => {
     changeState({
-      itemSelect: currInfo.data.find( val => val.name === weaponName ),
-      itemSelectBorder: borderName
+      itemSelect: currInfo.data.find( val => val.name === weaponName )
     })
-    if ( document.querySelector('.active-border') )
-      document.querySelector('.active-border').classList.remove('active-border');
-    document.getElementById(borderName).classList.add('active-border');
   }
 
   const btnTreeAltIcon = ( weaponName, iconPos ) => {
-    let weaponTypeFull = currInfo.altFull.toLowerCase();
-    let newWeapon = altInfo.data.find( val => val.name === weaponName );
-    changeState({
-      subTitle: weaponTypeFull,
-      itemSelect: newWeapon,
-      itemSelectBorder: ''
-    }, ()=>{
-      if ( document.querySelector('.active-border') )
-        document.querySelector('.active-border').classList.remove('active-border');
-      
-      // find the new border
-      let weapon = newWeapon;
-      let newBorder = '';
-      let prevWeapon = '';
-      let prevWeaponIcon = '';
-      if ( iconPos.startsWith('x0') ) { // the icon was the start of the other tree's branch
-        let borders = Array.from(document.querySelectorAll('.icon-border'));
-        newBorder = borders.find( border => border.dataset.weapon.startsWith(newWeapon.name));
-        changeState({ itemSelectBorder: newBorder.id })
-      }
-      else {
-        if ( typeof weapon["upgrade-from"] == "string" ) { // scraped as a string
-          prevWeapon = weapon["upgrade-from"];
-        } else { //otherwise, it's an array
-          prevWeapon = weapon["upgrade-from"].filter( oldWeapon => currInfo.data.find(val=>val.name===oldWeapon)===undefined)[0];
-        }
-        document.querySelectorAll('.main-icon').forEach( icon => icon.dataset.weapon.startsWith(prevWeapon)?prevWeaponIcon=icon:null)
-        newBorder = prevWeaponIcon.nextElementSibling;
-        changeState({ itemSelectBorder: newBorder.id })
+    const weaponTypeFull = currInfo.altFull.toLowerCase();
+    const newWeapon = altInfo.data.find( val => val.name === weaponName );
 
-      }
-
+    const scrollTo = ( newBorder ) => {
       let newScrollHeight = Math.floor(newBorder.y.baseVal.value)-document.querySelector('#svg-overflow-wrapper').offsetHeight/2;
       document.querySelector('#svg-overflow-wrapper').scrollTop = newScrollHeight;
       let newScrollWidth = Math.floor(newBorder.x.baseVal.value)-document.querySelector('#svg-overflow-wrapper').offsetWidth/2;
       document.querySelector('#svg-overflow-wrapper').scrollLeft = newScrollWidth;
+    }
+
+    changeState({
+      subTitle: weaponTypeFull,
+      itemSelect: newWeapon
+    }, ()=>{
+      
+      // find the new border and move scrollbars to it
+      let weapon = newWeapon;
+      let newBorder = Array.from(document.querySelectorAll('.icon-border')).find( ele => ele.dataset.weapon === weapon.name );
+      if ( !newBorder ) { // weapon is likely in a collapsed tree, collapse trees, reassign new border, then proceed
+        changeState( {collapsedTrees: []}, () => {
+          newBorder = Array.from(document.querySelectorAll('.icon-border')).find( ele => ele.dataset.weapon === weapon.name );
+          scrollTo(newBorder);
+        })
+      }
+      else { // weapon is likely not in a collapsed tree. proceed normally
+        scrollTo(newBorder);
+      }
       
       let tooltip = document.querySelector("#tooltip");
       tooltip.style.opacity = 0;
@@ -164,7 +151,7 @@ const Tree = ({changeState, zoom, oldZoom, currInfo, altInfo, currWeapon, collap
   newGrid.forEach( (row, y) => {
     // determine row name
     let rowName = row[0];
-    if ( rowName.includes(currInfo.alt) ) rowName = row[1];
+    if ( currInfo.alt && rowName.includes(currInfo.alt) ) rowName = row[1];
     if (rowName !== "" && rowName !== "+"){
       theTree.push(
         <text class={`title tree-title-${collapsedTrees.includes(rowName+" Tree")?'closed':'open'}`}

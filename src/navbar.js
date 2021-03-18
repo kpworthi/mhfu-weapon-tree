@@ -13,7 +13,8 @@ const NavBar = ({ title, subTitle, tagLine, changeState }) => {
         "Hunting Horn",
         "Hammer",
         "Gunlance",
-        "Lance"
+        "Lance",
+        "Bow"
       ]
     },
     kitchen: { 

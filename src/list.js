@@ -1,6 +1,6 @@
 import React from 'react';
 
-const List = ({changeState, sortParam, sortOrder, currData, currWeaponName, subTitle}) => {
+const List = ({changeState, sortParam, sortOrder, currData, currWeaponName, subTitle, currentStats, buildSharpness, buildCoatings}) => {
 
   const clickHandler = ( event ) => {
     // handle click on list table headers
@@ -16,15 +16,15 @@ const List = ({changeState, sortParam, sortOrder, currData, currWeaponName, subT
     // handle click on list tree link
     else if ( event.currentTarget.id.endsWith("tree-link") && event.currentTarget.textContent ) {
       event.stopPropagation();
-      btnListTreeLink( event.currentTarget.id );
+      btnListTreeLink( event.currentTarget.parentElement.dataset.weapon );
     }
   }
 
   const btnListTableHeader = ( textContent ) => {
     // let's not sort by sharpness just yet
-    if ( !['Sharpness', 'Tree Link', ''].includes(textContent) ) {
+    if ( !['Sharpness', 'Tree Link', 'Coatings', 'Shots', ''].includes(textContent) ) {
       let newSortKey = '';
-      if ( textContent === 'Defense' ) newSortKey = 'bonus'; // convert 'defense' header to 'bonus'
+      if ( textContent === 'Defense Bonus' ) newSortKey = 'bonus'; // convert 'defense' header to 'bonus'
       else if ( textContent.length > 10 ) return null; // managed to click on empty area of the row or something
       else newSortKey = textContent.toLowerCase()
       
@@ -35,26 +35,35 @@ const List = ({changeState, sortParam, sortOrder, currData, currWeaponName, subT
         document.querySelectorAll('.list-header').forEach( el => {
           let elText = el.textContent.toLowerCase();
           el.classList.remove('header-bold');
-          if ( elText === newSortKey || (elText === 'defense' && 'bonus' === newSortKey) ) el.classList.add('header-bold');
+          if ( elText === newSortKey || (elText === 'defense bonus' && 'bonus' === newSortKey) ) el.classList.add('header-bold');
         });
         changeState({listSortBy: newSortKey})
       }
     }
   }
 
-  const btnListTreeLink = ( eventCurrTgtId ) => {
-    const clickedWeapon = eventCurrTgtId.split('-tree')[0]
-    changeState({
-      itemSelect: currData.data.find(weapon => weapon.name.toLowerCase() === clickedWeapon),
-      mode: 'tree'
-    }, () => {
-      let borders = Array.from(document.querySelectorAll('.icon-border'))
-      let newBorder = borders.find( border => border.dataset.weapon.toLowerCase().startsWith( clickedWeapon ))
+  const btnListTreeLink = ( clickedWeapon ) => {
+    let scrollTo = ( newBorder ) => {
       let newScrollHeight = Math.floor(newBorder.y.baseVal.value)-document.querySelector('#svg-overflow-wrapper').offsetHeight/2;
       document.querySelector('#svg-overflow-wrapper').scrollTop = newScrollHeight;
       let newScrollWidth = Math.floor(newBorder.x.baseVal.value)-document.querySelector('#svg-overflow-wrapper').offsetWidth/2;
       document.querySelector('#svg-overflow-wrapper').scrollLeft = newScrollWidth;
-      changeState( { itemSelectBorder: newBorder.id })
+    }
+
+    changeState({
+      itemSelect: currData.data.find(weapon => weapon.name === clickedWeapon),
+      mode: 'tree'
+    }, () => {
+      let newBorder = Array.from(document.querySelectorAll('.icon-border')).find( ele => ele.dataset.weapon === clickedWeapon );
+      if ( !newBorder ) { // weapon is likely in a collapsed tree, collapse trees, reassign new border, then proceed
+        changeState( {collapsedTrees: []}, () => {
+          newBorder = Array.from(document.querySelectorAll('.icon-border')).find( ele => ele.dataset.weapon === clickedWeapon );
+          scrollTo(newBorder);
+        })
+      }
+      else { // weapon is likely not in a collapsed tree. proceed normally
+        scrollTo(newBorder);
+      }
     });
   }
 
@@ -70,23 +79,10 @@ const List = ({changeState, sortParam, sortOrder, currData, currWeaponName, subT
     )
   }
 
-  const buildSharpness = ( sharpString ) => {
-    let sharpness = [];
-    if ( sharpString === 'Unknown' ) return "Info Needed";
-    else{
-      for (let i=0; i<sharpString.length; i+=4) {
-        sharpness.push(sharpString.slice(i,i+4));
-      }
-      return (
-        <div class="sharp-container">
-          {sharpness.map( (str, ind) => {
-            return (
-              <div class={`sharp-bar ${str[0].toLowerCase()} ${str.slice(1)} ${ind>0&&sharpness[ind-1].slice(-3)===str.slice(-3)?'sh-dbl':null}`}/>
-            )}
-          )}
-        </div>
-      )
-    }
+  const buildShotsPreview = ( shots ) => {
+    let shotString = '';
+    shots.forEach( shot => shotString += shot[0] + ' ' + shot[shot.length-1]);
+    return shotString;
   }
 
   let theList = currData.data.sort((a,b) => {
@@ -125,17 +121,12 @@ const List = ({changeState, sortParam, sortOrder, currData, currWeaponName, subT
         <thead>
           <tr id="list-header-row" onClick={clickHandler}>
             <td class="list-header header-bold">Name</td>
-            <td class="list-header">Attack</td>
-            <td class="list-header">Element</td>
-            <td class="list-header">Affinity</td>
-            {subTitle !== "hunting horn"?null:
-            <td class="list-header">Notes</td>}
-            {subTitle !== "gunlance"?null:
-            <td class="list-header">Shelling</td>}
-            <td class="list-header">{["bow", "hbg", "lbg"].includes(currData.abbr)?"Coatings":"Sharpness"}</td>
-            <td class="list-header">Slots</td>
-            <td class="list-header">Defense</td>
-            <td class="list-header">Rarity</td>
+            {currentStats.map( stat => {
+              let title = stat.split('');
+              title[0] = title[0].toUpperCase();
+              title = title.join('');
+              return <td class="list-header">{title=="Bonus"?"Defense Bonus":title}</td>} 
+            )}
             <td class="list-header">Tree Link</td>
           </tr>
         </thead>
@@ -147,18 +138,17 @@ const List = ({changeState, sortParam, sortOrder, currData, currWeaponName, subT
                   data-weapon={weapon.name}
                   onClick={clickHandler}>
                 <td id={`${weapon.name.toLowerCase()}-name`} class="list-cell pr-2" >{weapon.name}</td>
-                <td id={`${weapon.name.toLowerCase()}-attack`} class="list-cell pr-2">{weapon.attack}</td>
-                <td id={`${weapon.name.toLowerCase()}-element`} class="list-cell pr-2">{weapon.element}</td>
-                <td id={`${weapon.name.toLowerCase()}-affinity`} class="list-cell pr-2">{weapon.affinity}</td>
-                {weapon.type !== "hh"?null:
-                <td id={`${weapon.name.toLowerCase()}-notes`} class="list-cell pr-2">{buildNotesPreview(weapon.notes)}</td>}
-                {weapon.type !== "gl"?null:
-                <td id={`${weapon.name.toLowerCase()}-shelling`} class="list-cell pr-2">{weapon.shelling}</td>}
-                {["bow", "hbg", "lbg"].includes(weapon.type)?<td id={`${weapon.name.toLowerCase()}-sharpness`} class="list-cell pr-2" />:
-                <td id={`${weapon.name.toLowerCase()}-sharpness`} class="list-cell pr-2">{buildSharpness(weapon.sharpness)}</td>}
-                <td id={`${weapon.name.toLowerCase()}-slots`} class="list-cell pr-2">{weapon.slots}</td>
-                <td id={`${weapon.name.toLowerCase()}-defense`} class="list-cell pr-2">{weapon.bonus}</td>
-                <td id={`${weapon.name.toLowerCase()}-rarity`} class="list-cell pr-2">{weapon.rarity}</td>
+                {currentStats.map( key => {
+                  return (
+                    <td id={`${weapon.name.toLowerCase()}-${key}`} class="list-cell pr-2">
+                      {key=="sharpness"?buildSharpness(weapon.sharpness):
+                       key==="notes"?buildNotesPreview(weapon.notes):
+                       key==="coatings"?buildCoatings( weapon.coatings ):
+                       key==="shots"?buildShotsPreview( weapon.shots ):
+                       weapon[key]}
+                    </td>
+                  )
+                })}
                 <td id={`${weapon.name.toLowerCase()}-tree-link`} 
                     class="list-cell text-center" 
                     onClick={clickHandler}>

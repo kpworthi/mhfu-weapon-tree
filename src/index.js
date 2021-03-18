@@ -28,6 +28,7 @@ class Main extends React.Component {
                  };
                  
     this.currentType = 'sword and shield';
+    this.currentStats = [];
     this.rowTicks = {};
     this.mouseDown = false;
     this.ctrlState = false;
@@ -56,12 +57,12 @@ class Main extends React.Component {
     this.clickHandler = this.clickHandler.bind(this);
     this.dragHandler   = this.dragHandler.bind(this);
     this.keyHandler    = this.keyHandler.bind(this);
-    this.tooltip   = this.tooltip.bind(this);
   }
 
   componentDidMount(){
     document.onkeydown = this.keyHandler;
     document.onkeyup = this.keyHandler;
+    this.currentStats = this.buildStats( this.state.subTitle );
     import('./db-bundle.js')
       .then( module => {
         this.dataAndMaps['dual blades'].data = module.default;
@@ -88,42 +89,37 @@ class Main extends React.Component {
         this.dataAndMaps['hammer'].data = module.default;
         this.dataAndMaps['hammer'].map  = module.hmMap;
       });
-      import('./gl-bundle.js')
-        .then( module => {
-          this.dataAndMaps['gunlance'].data = module.default;
-          this.dataAndMaps['gunlance'].map  = module.glMap;
-        });
-      import('./la-bundle.js')
-        .then( module => {
-          this.dataAndMaps['lance'].data = module.default;
-          this.dataAndMaps['lance'].map  = module.laMap;
-        });
-      /*
-      import('./bow-bundle.js')
-        .then( module => {
-          this.dataAndMaps['bow'].data = module.default;
-          this.dataAndMaps['bow'].map  = module.bowMap;
-        });
-      */
+    import('./gl-bundle.js')
+      .then( module => {
+        this.dataAndMaps['gunlance'].data = module.default;
+        this.dataAndMaps['gunlance'].map  = module.glMap;
+      });
+    import('./la-bundle.js')
+      .then( module => {
+        this.dataAndMaps['lance'].data = module.default;
+        this.dataAndMaps['lance'].map  = module.laMap;
+      });
+    import('./bow-bundle.js')
+      .then( module => {
+        this.dataAndMaps['bow'].data = module.default;
+        this.dataAndMaps['bow'].map  = module.bowMap;
+      });
   }
 
-  componentDidUpdate(){
-    // track hiding/showing border highlight on tree collapsing/expanding or whole tree switch
-    if ( this.state.mode === "tree" ){
-      if ( document.querySelector('.active-border') )
-        document.querySelectorAll('.active-border').forEach( border => border.classList.remove('active-border') );
-      if ( this.state.itemSelect && this.state.itemSelect.type == this.dataAndMaps[this.state.subTitle].abbr ){
-        // do border update only if there wasn't a manual tree switch  
-        if ( this.state.itemSelect && document.getElementById(this.state.itemSelectBorder)   ){
-          let newBorder = document.getElementById(this.state.itemSelectBorder);
-          if ( newBorder.dataset.weapon === this.state.itemSelect.name ) newBorder.classList.add('active-border')
-        }
-        else {
-          let borders = Array.from(document.querySelectorAll('.icon-border'));
-          let newBorder = borders.find( border => border.dataset.weapon.startsWith(this.state.itemSelect.name) );
-          if ( newBorder ) newBorder.classList.add('active-border');
-        }
-      }
+  componentDidUpdate(){ 
+    // adjust the main stat list on weapon type change ( used in panel and list views )
+    if ( this.currentType !== this.state.subTitle ){
+      this.currentStats = this.buildStats(this.state.subTitle);
+      this.currentType = this.state.subTitle;
+    }
+    let selectedBorder = Array.from(document.querySelectorAll('.icon-border')).find( ele => ele.dataset.weapon === this.state.itemSelect.name );
+    let currentActive = document.querySelector('.active-border');
+    if ( !selectedBorder ){
+      if ( currentActive ) currentActive.classList.remove('active-border');
+    }
+    else if ( this.state.itemSelect && !selectedBorder.classList.contains('active-border') ){
+      if ( currentActive ) currentActive.classList.remove('active-border');
+      selectedBorder.classList.add('active-border');
     }
   }
 
@@ -136,7 +132,6 @@ class Main extends React.Component {
     else if ( event.target.id.startsWith("mode") ) {
       this.setState({"mode": this.state.mode==="tree"?"list":"tree"})
     }
-    console.log(Date.now() - timerStart + " ms")
   }
 
   dragHandler (event) {
@@ -186,6 +181,24 @@ class Main extends React.Component {
     }
   }
 
+  buildCoatingList ( coatings ) {
+    
+    const coatingColors = {
+      'power': 'red',
+      'close range': 'white',
+      'poison': 'purple',
+      'paralysis': 'yellow',
+      'sleep': 'aqua', 
+      'paint': 'pink'
+    }
+    return coatings.map( coating => {
+      let coatingTitle = coating.split('');
+      coatingTitle[0] = coatingTitle[0].toUpperCase();
+      coatingTitle = coatingTitle.join('') + " Coating";
+      return <img class={`coating-icon c${coatingColors[coating].slice(0,2)}`} src={`../ico/coat2.png`} title={coatingTitle}/>
+    });
+  }
+
   buildNotesList ( noteString ) {
     let noteDict = { a: 'aqua', b: 'blue', p: 'purple', g: 'green', y: 'yellow', r: 'red', w: 'white'};
     let noteArray = noteString.match(/\.[a-z]+/g).map( newNote => noteDict[newNote.slice(1,2)])
@@ -199,9 +212,8 @@ class Main extends React.Component {
     )
   }
 
-  buildSharpness ( weapon ) {
+  buildSharpness ( sharpString ) {
     let sharpness = [];
-    let sharpString = weapon.sharpness;
     for (let i=0; i<sharpString.length; i+=4) {
       sharpness.push(sharpString.slice(i,i+4));
     }
@@ -219,44 +231,34 @@ class Main extends React.Component {
     }
   }
 
-  tooltip () {
-    const selected = this.state.itemSelect; // is there an item selected? if yes, what is it
-    const hoverItem = this.state.itemHover; // is there an item being hovered? if yes, what is it
-    const altType = hoverItem.type===this.dataAndMaps[this.state.subTitle].alt; // is the hover item's type not the current branches' type?
-    const compare = this.state.ctrlState && selected.type===hoverItem.type && hoverItem.name !== selected.name; // is ctrl being held, are the types the same, and are the items different?
-    const isRanged = hoverItem?["bow","hbg","lbg"].includes(hoverItem.type):false;
+  buildStats ( weaponType ) {
+    const commonStatsUpper = ['attack', 'element'];
+    const commonStatsLower = ['affinity', 'slots', 'bonus', 'rarity'];
+    const extraStats = {
+      "hunting horn": ["notes"],
+      "gunlance": ["shelling"],
+      "bow": ["coatings", "shots"],
+      "heavy bowgun": ["reload", "recoil"],
+      "light bowgun": ["reload", "recoil"]
+    }
+    const wpnAbbrTranslation = {
+      'sns': 'sword and shield',
+      'db' : 'dual blades',
+      'gs' : 'great sword',
+      'ls' : 'long sword',
+      'hh' : 'hunting horn',
+      'hm' : 'hammer',
+      'la' : 'lance',
+      'gl' : 'gunlance',
+      'bow': 'bow'
+    }
+    if ( Object.keys(wpnAbbrTranslation).includes(weaponType) ) weaponType = wpnAbbrTranslation[weaponType];
+
     return (
-      <table id="tooltip" class="tooltip">
-        <thead>
-          <tr>
-            <th id="tool-name" colspan="2">{!hoverItem?"*":hoverItem.name+(altType?` (${this.dataAndMaps[this.state.subTitle].altFull})`:"")}</th>
-            <th id="compare-name" colspan="1">{compare?selected.name:null}</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><b>{!hoverItem||altType?"Click to change trees":"Attack"}</b></td>
-            <td id="tool-attack">{!hoverItem||altType?'':hoverItem.attack}</td>
-            <td id="compare-attack" class="pl-2">{compare?selected.attack:null}</td>
-          </tr>
-          <tr>
-            <td><b>{!hoverItem||altType?null:"Element"}</b></td>
-            <td id="tool-element">{!hoverItem||altType?'':hoverItem.element}</td>
-            <td id="compare-element" class="pl-2">{compare?selected.element:null}</td>
-          </tr>
-          <tr>
-            <td><b>{!hoverItem||altType?null:"Sharpness"}</b></td>
-            <td id="tool-sharp">
-              {!hoverItem||altType||isRanged?null:this.buildSharpness(hoverItem)}
-            </td>
-          </tr><tr>
-            <td />
-            <td id="compare-sharp">
-              {compare&&selected?this.buildSharpness( this.state.itemSelect ):selected&&!altType&&hoverItem.name!==selected.name?"Compare with 'ctrl' ":null}
-            </td>
-          </tr>
-        </tbody>
-      </table>
+           commonStatsUpper                                      //add first set
+            .concat(weaponType.includes("bow")?[]:["sharpness"]) //add sharpness if a blademaster weapon
+            .concat(extraStats[weaponType]||[])                      //add unique properties
+            .concat(commonStatsLower)                            //add second set of common properties
     )
   }
 
@@ -276,47 +278,59 @@ class Main extends React.Component {
           {this.state.mode==="tree"?
           <div id="svg-overflow-wrapper" 
                class="col-md-8 col-lg-9"
-               onMouseLeave={this.dragHandler}
-               onMouseDown={this.dragHandler}
-               onMouseUp={this.dragHandler}
-               onMouseMove={this.dragHandler}>
+               onMouseLeave = {this.dragHandler}
+               onMouseDown  = {this.dragHandler}
+               onMouseUp    = {this.dragHandler}
+               onMouseMove  = {this.dragHandler}>
             <Tree 
-              changeState={this.changeState}
-              zoom={this.state.zoom}
-              oldZoom={this.state.oldZoom}
-              currInfo={this.dataAndMaps[this.state.subTitle.toLowerCase()]}
-              altInfo={this.dataAndMaps[this.dataAndMaps[this.state.subTitle].altFull.toLowerCase()]}
-              currWeapon={this.state.itemSelect}
-              collapsedTrees={this.state.collapsedTrees}
+              changeState    = {this.changeState}
+              zoom           = {this.state.zoom}
+              oldZoom        = {this.state.oldZoom}
+              currInfo       = {this.dataAndMaps[this.state.subTitle.toLowerCase()]}
+              altInfo        = {this.dataAndMaps[this.dataAndMaps[this.state.subTitle].altFull.toLowerCase()]}
+              currWeapon     = {this.state.itemSelect}
+              collapsedTrees = {this.state.collapsedTrees}
             />
           </div>
           :
-          <List changeState={this.changeState} 
-                 sortParam={this.state.listSortBy} 
-                 sortOrder={this.state.listSortOrder}
-                 currData={this.dataAndMaps[this.state.subTitle.toLowerCase()]}
-                 currWeaponName={this.state.itemSelect.name}
-                 subTitle={this.state.subTitle}
+          <List  changeState    = {this.changeState} 
+                 sortParam      = {this.state.listSortBy} 
+                 sortOrder      = {this.state.listSortOrder}
+                 currData       = {this.dataAndMaps[this.state.subTitle.toLowerCase()]}
+                 currWeaponName = {this.state.itemSelect.name}
+                 subTitle       = {this.state.subTitle}
+                 currentStats   = {this.buildStats( this.state.subTitle )}
+                 buildSharpness = {this.buildSharpness}
+                 buildCoatings  = {this.buildCoatingList}
           />}
 
-          <Panel selectedWeapon={selectedWeapon} 
-                 buildSharpness={this.buildSharpness}
-                 buildNotesList={this.buildNotesList}
-                 hhSongs={this.hhSongs}
+          <Panel selectedWeapon   = {selectedWeapon} 
+                 buildCoatingList = {this.buildCoatingList}
+                 buildSharpness   = {this.buildSharpness}
+                 buildNotesList   = {this.buildNotesList}
+                 hhSongs          = {this.hhSongs}
+                 currentStats     = {selectedWeapon?this.buildStats( selectedWeapon.type ):undefined}
           />
 
         </div>
 
-        {this.tooltip()}
+        <Tooltip itemSelect     = {this.state.itemSelect}
+                 itemHover      = {this.state.itemHover}
+                 altAbbr        = {this.dataAndMaps[this.state.subTitle].alt}
+                 altFull        = {this.dataAndMaps[this.state.subTitle].altFull}
+                 ctrlState      = {this.state.ctrlState}
+                 buildSharpness = {this.buildSharpness}
+        />
+
+        <p class="small">Images property of Capcom. A majority of the data obtained from <a href="https://monsterhunter.fandom.com">monsterhunter.fandom.com</a></p>
 
       </div>
     )
   }
 }
 
-function Panel ( {selectedWeapon, buildSharpness, buildNotesList, hhSongs} ) {
+function Panel ( {selectedWeapon, buildSharpness, buildCoatingList, buildNotesList, hhSongs, currentStats} ) {
 
-  let wpnsWithExtra = [ 'hh', 'gl']
   let noteArray = [];
   if (selectedWeapon && selectedWeapon.type==="hh"){
     noteArray = selectedWeapon.notes.match(/\.[a-z]+/g).map( newNote => newNote.slice(1,2) )
@@ -330,14 +344,18 @@ function Panel ( {selectedWeapon, buildSharpness, buildNotesList, hhSongs} ) {
       <table id="panel-main-table" class="panel-main-table ml-2">
         <thead><tr> <th id="panel-weapon-name" class="text-center" colspan="2">{selectedWeapon.name}</th> </tr></thead>
         <tbody>
-          {Object.keys(selectedWeapon).slice(1,wpnsWithExtra.includes(selectedWeapon.type)?9:8).map( key => {
+          {currentStats.map( key => {
             let title = key.split(''); title[0] = title[0].toUpperCase(); title = title.join('');
             return (
               <tr>
                 <td class="px-1"><b>{title=="Bonus"?"Defense Bonus":title}</b></td>
                 <td id={`panel-${key}`} class="px-1">
-                  {key=="sharpness"?buildSharpness(selectedWeapon):
-                                    key==="notes"?buildNotesList(selectedWeapon.notes, false):selectedWeapon[key]}
+                  {key==="sharpness"?buildSharpness(selectedWeapon.sharpness):
+                   key==="notes"?buildNotesList(selectedWeapon.notes):
+                   key==="coatings"?buildCoatingList( selectedWeapon.coatings ):
+                   key==="shots"?selectedWeapon.shots.map( shot => shot + " "):
+                   key===""?'':
+                   selectedWeapon[key]}
                 </td>
               </tr>
             )
@@ -415,6 +433,63 @@ function Panel ( {selectedWeapon, buildSharpness, buildNotesList, hhSongs} ) {
       </table>
       )}
     </div>
+  )
+}
+
+function Tooltip ( {itemSelect, itemHover, altAbbr, altFull, ctrlState, buildSharpness} ) {
+  const selected = itemSelect || ""; // is there an item selected? if yes, what is it
+  const hoverItem = itemHover || ""; // is there an item being hovered? if yes, what is it
+  const hoverIsRanged = hoverItem?["bow","hbg","lbg"].includes(hoverItem.type):false; // is the hovered item a ranged weapon?
+  const selectedIsRanged = selected?["bow","hbg","lbg"].includes(selected.type):false; // is the selected item a ranged weapon?
+  const altType = hoverItem.type === altAbbr; // is the hover item's type not the current branches' type?
+  const compare = ctrlState &&
+                  selected &&
+                  hoverItem.name !== selected.name; // is ctrl being held, is an item selected, and are the items different?
+
+  if ( !hoverItem ) return <table id="tooltip" class="tooltip" />
+  else if ( altType ) return (
+    <table id="tooltip" class="tooltip">
+      <thead>
+        <tr>
+          <th id="tool-name" colspan="2">{`${hoverItem.name} (${altFull})`}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><b>Click to change trees</b></td>
+        </tr>
+      </tbody>
+    </table>
+  )
+  else return (
+    <table id="tooltip" class="tooltip">
+      <thead>
+        <tr>
+          <th id="tool-header-name" colspan="1">Name</th>
+          <th id="tool-header-attack" colspan="1">Attack</th>
+          <th id="tool-header-element" colspan="1">Element</th>
+          <th id="tool-header-sharp" colspan="1">Sharpness</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td id="tool-name" colspan="1">{hoverItem.name}</td>
+          <td id="tool-attack">{hoverItem.attack}</td>
+          <td id="tool-element">{hoverItem.element}</td>
+          <td id="tool-sharp">{hoverIsRanged?"N/A":buildSharpness( hoverItem.sharpness )}</td>
+        </tr>
+        {compare?
+        <tr>
+          <td id="compare-name" colspan="1">{selected.name}</td>
+          <td id="compare-attack">{selected.attack}</td>
+          <td id="compare-element">{selected.element}</td>
+          <td id="compare-sharp">{selectedIsRanged?"N/A":buildSharpness( selected.sharpness )}</td>
+        </tr>:
+        selected && hoverItem.name !== selected.name?
+        <tr><td colspan="4" class="font-italic">Compare with 'control' key</td></tr>:
+        <tr><td colspan="4" /></tr>}
+      </tbody>
+    </table>
   )
 }
 
