@@ -168,7 +168,7 @@ body {
   border: 1px solid black;
   background-color: rgb(183, 232, 226);
   background-image: linear-gradient(rgba(183, 232, 226, 0.95), rgba(183, 232, 226, 0.95)),
-                    url('../ico/sns.png')
+                    url('./ico/sns.png')
 }
 
 /* List Definitions */
@@ -180,7 +180,7 @@ body {
   border: 1px solid black;
   background-color: rgb(183, 232, 226);
   background-image: linear-gradient(rgba(183, 232, 226, 0.95), rgba(183, 232, 226, 0.95)),
-                    url('../ico/sns.png')
+                    url('./ico/sns.png')
 }
 
 #list-container table {

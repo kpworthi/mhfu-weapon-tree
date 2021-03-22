@@ -1,6 +1,6 @@
 import React from 'react';
 
-const List = ({changeState, sortParam, sortOrder, currData, currWeaponName, subTitle, currentStats, buildSharpness, buildCoatings}) => {
+const List = React.memo(({changeState, sortParam, sortOrder, currData, subTitle, currentStats, buildSharpness, buildCoatings}) => {
 
   const clickHandler = ( event ) => {
     // handle click on list table headers
@@ -71,9 +71,9 @@ const List = ({changeState, sortParam, sortOrder, currData, currWeaponName, subT
     let noteDict = { a: 'aqua', b: 'blue', p: 'purple', g: 'green', y: 'yellow', r: 'red', w: 'white'};
     let noteArray = noteList.match(/\.[a-z]+/g).map( newNote => noteDict[newNote.slice(1,2)])
     return (
-      <div class="note-wrapper">
+      <div className="note-wrapper">
         {noteArray.map( color => 
-          <div class={`note-block-empty s ${color.slice(0,3)} ml-1`} />
+          <div className={`note-block-empty s ${color.slice(0,3)} ml-1`} key={color} />
         )}
       </div>
     )
@@ -115,32 +115,35 @@ const List = ({changeState, sortParam, sortOrder, currData, currWeaponName, subT
     return 0;
   })
 
+  console.log('list re-render');
+
   return (
-    <div id="list-container" class="col-md-8 col-lg-9">
+    <div id="list-container" className="col-md-8 col-lg-9">
       <table id="weapon-list">
         <thead>
           <tr id="list-header-row" onClick={clickHandler}>
-            <td class="list-header header-bold">Name</td>
+            <td className="list-header header-bold">Name</td>
             {currentStats.map( stat => {
               let title = stat.split('');
               title[0] = title[0].toUpperCase();
               title = title.join('');
-              return <td class="list-header">{title=="Bonus"?"Defense Bonus":title}</td>} 
+              return <td className="list-header" key={stat}>{title=="Bonus"?"Defense Bonus":title}</td>} 
             )}
-            <td class="list-header">Tree Link</td>
+            <td className="list-header">Tree Link</td>
           </tr>
         </thead>
         <tbody>
           {theList.map( weapon =>{
             return (
               <tr id={`${weapon.name.toLowerCase()}-row`} 
-                  class={weapon.name === currWeaponName?"header-bold":null}
+                  key={`${weapon.name.toLowerCase()}-row-key`}
+                  className="list-row"
                   data-weapon={weapon.name}
                   onClick={clickHandler}>
-                <td id={`${weapon.name.toLowerCase()}-name`} class="list-cell pr-2" >{weapon.name}</td>
+                <td id={`${weapon.name.toLowerCase()}-name`} className="list-cell pr-2" >{weapon.name}</td>
                 {currentStats.map( key => {
                   return (
-                    <td id={`${weapon.name.toLowerCase()}-${key}`} class="list-cell pr-2">
+                    <td id={`${weapon.name.toLowerCase()}-${key}`} key={`${weapon.name}-${key}`} className="list-cell pr-2">
                       {key=="sharpness"?buildSharpness(weapon.sharpness):
                        key==="notes"?buildNotesPreview(weapon.notes):
                        key==="coatings"?buildCoatings( weapon.coatings ):
@@ -150,7 +153,7 @@ const List = ({changeState, sortParam, sortOrder, currData, currWeaponName, subT
                   )
                 })}
                 <td id={`${weapon.name.toLowerCase()}-tree-link`} 
-                    class="list-cell text-center" 
+                    className="list-cell text-center" 
                     onClick={clickHandler}>
                       {weapon.name.endsWith("G")||(weapon["upgrade-to"]==="N/A"&&weapon["upgrade-from"]==="N/A")?null:<span>O</span>}
                 </td>
@@ -161,6 +164,11 @@ const List = ({changeState, sortParam, sortOrder, currData, currWeaponName, subT
       </table>
     </div>
   )
-}
+}, ( oldProps, newProps) => {
+  if ( oldProps.subTitle === newProps.subTitle ) return true;
+  else if ( oldProps.sortParam === newProps.sortParam ) return true;
+  else if ( oldProps.sortOrder === newProps.sortOrder ) return true;
+  return false;
+})
 
 export default List;

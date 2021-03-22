@@ -1,15 +1,12 @@
 {
   "name": "mhfu-weapon-trees",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "KPWorthi personal project, MHFU Weapon Tree Display",
   "repository": "https://www.github.com/kpworthi/mhfu-weapon-tree",
   "main": "server.js",
   "scripts": {
-    "babel": "babel src -d public",
-    "babelwatch": "babel src --watch -d public",
-    "sass": "sass src:public",
-    "build": "npm run babel && npm run sass",
-    "start": "nodemon server.js"
+    "build": "webpack --config webpack.prod.js",
+    "start": "webpack serve --config webpack.dev.js"
   },
   "dependencies": {
     "body-parser": "^1.19.0",
@@ -33,6 +30,7 @@
     "speed-measure-webpack-plugin": "^1.4.2",
     "style-loader": "^2.0.0",
     "webpack": "^5.4.0",
-    "webpack-cli": "^4.5.0"
+    "webpack-cli": "^4.5.0",
+    "webpack-dev-server": "^3.11.2"
   }
 }
