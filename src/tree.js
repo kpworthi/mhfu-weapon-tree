@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Tree = ({changeState, zoom, oldZoom, currInfo, altInfo, currWeapon, collapsedTrees}) => {
+const Tree = React.memo(({changeState, zoom, oldZoom, currInfo, altInfo, currWeapon, collapsedTrees}) => {
 
   const clickHandler = ( event ) => {
     // handle clicking on current tree's icons
@@ -17,13 +17,13 @@ const Tree = ({changeState, zoom, oldZoom, currInfo, altInfo, currWeapon, collap
     }
   }
 
-  const btnTreeIcon = ( weaponName, borderName ) => {
+  const btnTreeIcon = ( weaponName ) => {
     changeState({
       itemSelect: currInfo.data.find( val => val.name === weaponName )
     })
   }
 
-  const btnTreeAltIcon = ( weaponName, iconPos ) => {
+  const btnTreeAltIcon = ( weaponName ) => {
     const weaponTypeFull = currInfo.altFull.toLowerCase();
     const newWeapon = altInfo.data.find( val => val.name === weaponName );
 
@@ -139,85 +139,87 @@ const Tree = ({changeState, zoom, oldZoom, currInfo, altInfo, currWeapon, collap
   });
   newGrid = newGrid.filter( (val,ind) => !rowFilter.includes(ind) );
 
-  let theTree = []
-  theTree.push(
-    <defs>
-    <linearGradient id="myGradient" gradientTransform="rotate(90)">
-      <stop offset="5%"  stop-color="gold" />
-      <stop offset="95%" stop-color="red" />
-    </linearGradient>
-  </defs>
-  )
-  newGrid.forEach( (row, y) => {
+  let theTree = [];
+  for ( let i = 0; i<newGrid.length; i++ ) {
+    const row = newGrid[i];
+    const y   = i;
     // determine row name
     let rowName = row[0];
     if ( currInfo.alt && rowName.includes(currInfo.alt) ) rowName = row[1];
-    if (rowName !== "" && rowName !== "+"){
+    if ( rowName !== "" && rowName !== "+" ) {
       theTree.push(
-        <text class={`title tree-title-${collapsedTrees.includes(rowName+" Tree")?'closed':'open'}`}
+        <text className={`title tree-title-${collapsedTrees.includes(rowName+" Tree")?'closed':'open'}`}
+              key={`title${y}`}
               x="5" 
               y={paddingY+5+boxWidth/2+boxSpaceY*y} 
               onClick={clickHandler}>
                 {`${rowName} Tree`}
         </text>
-      );}    
+      );
+    }    
 
     // calculate row horizontal line start/end
-    let rowFirstItem = row.findIndex( (cell, ind ) => cell !== "");
-    let rowLastItem = row.slice(rowFirstItem)
-                          .findIndex( (cell, ind, arr ) => ind+1 === arr.length || arr[ind+1] === "") + rowFirstItem;
+    const rowFirstItem = row.findIndex( (cell, ind ) => cell !== "");
+    const rowLastItem  = row.slice(rowFirstItem)
+                            .findIndex( (cell, ind, arr ) => ind+1 === arr.length || arr[ind+1] === "") + rowFirstItem;
 
     // line paints from center of first item, unless it's a branch node
     // for branch nodes, it paints from the middle of the next cell over
-    let lineX = 0;
-    lineX = row[rowFirstItem] === "+"?(paddingX+boxWidth+hLineLength/2)+boxSpaceX*rowFirstItem:
-                                      (paddingX+boxWidth/2)+boxSpaceX*rowFirstItem;
-    let lineMod = row[rowFirstItem] === "+"?1:0;
+    const startX = row[rowFirstItem] === "+"?(paddingX+boxWidth+hLineLength/2)+boxSpaceX*rowFirstItem:
+                                             (paddingX+boxWidth/2)+boxSpaceX*rowFirstItem;
+    const startY = (paddingY+boxWidth/2)+boxSpaceY*y;
+    const lineMod = row[rowFirstItem] === "+"?1:0;
+    const stopX  = startX + (rowLastItem-rowFirstItem)*boxWidth + (rowLastItem-rowFirstItem-lineMod)*hLineLength;
 
     theTree.push(
-      <rect id={`row-line-${y}`} 
-            class="h-line" 
-            width={(rowLastItem-rowFirstItem)*boxWidth + (rowLastItem-rowFirstItem-lineMod)*hLineLength}
-            height="2" 
-            x={lineX}
-            y={(paddingY+boxWidth/2)+boxSpaceY*y-1} 
-            stroke="black" 
-            fill="black">
-      </rect>);
+      <line id={`row-line-${y}`} 
+            key={`row-line-${y}`}
+            className="h-line"
+            x1={startX}
+            x2={stopX}
+            y1={startY} 
+            y2={startY}
+            stroke="black"
+            strokeWidth="2"
+      />);
 
     // paint vertical lines and the item boxes
-    row.forEach( (cell, x) => {
+    for ( let j = 0; j<row.length; j++ ) {
+      const cell = row[j];
+      const x    = j;
       // calculate column line positions (only on first row iteration)
+      // vertical lines go from the space between two icons until the final "+" (branch)
+      // is reached for that item
       if ( y === 0 ) {
         let vPairs = []; // array for all the start/end points for each vertical line
         let column = []; // array for the current column
         newGrid.forEach( rowAgain => column.push(rowAgain[x]) )
         if ( column.indexOf("+") !== -1 ) { // make sure there's a "+"
-          for (let i=0; i<column.length; i++) { // iterate over each column item
-            let cell = column[i];
+          for (let k=0; k<column.length; k++) { // iterate over each column item
+            const cell = column[k];
             if (cell === "+") { // check to see if the current "+" is the last branch or not, then set it
-              let cellLeft = column.slice(0,i);
-              let cellRight = column.slice(i+1);
+              let cellsLeft = column.slice(0,k);
+              let cellsRight = column.slice(k+1);
               let continueFlag = false;
-              if ( i === column.length-1 ) vPairs.push([0,i]); // if it's the last "+" in a column, set it
+              if ( k === column.length-1 ) vPairs.push([0,k]); // if it's the last "+" in a column, set it
               else {
-                for (let j=0; j<cellRight.length; j++) { // iterate over every item to the right of the current cell
-                  
-                  if (cellRight[j] === "+") {
+                let rightCell = '';
+                for ( let ii=0; ii<cellsRight.length; ii++ ) { // iterate over every item to the right of the current cell
+                  if ( cellsRight[ii] === "+" ) {
                     continueFlag = true; // if it's another "+", it's not the last branch, check next item in column
                     break;
                   }
-                  else if ( j === column.length-1 || j !== "" ) {
-                    vPairs.push([0,i]); // add the y-position of "+" to the vPair array
+                  else if ( cellsRight[ii] !== "" ) {
+                    vPairs.push([0,k]); // add the y-position of "+" to the vPair array
                     break; // break early if it wasn't the end of the column
                   }
                 }
               }
-              if (continueFlag) continue; // stop checking this column item if it was determined not the last branch
+              if ( continueFlag ) continue; // stop checking this column item if it was determined not the last branch
 
-              for (let j=i-1; j >= 0; j--) { // iterate over every item to the left of the current cell
-                if (cellLeft[j] !== "+" && cellLeft[j] !== "") { // not a "+" or empty space, must be the branch root
-                  vPairs[vPairs.length-1][0] = j; // modify the first val in last item in vPair to current index (y position)
+              for ( let jj=k-1; jj >= 0; jj-- ) { // iterate over every item to the left of the current cell
+                if ( cellsLeft[jj] !== "+" && cellsLeft[jj] !== "" ) { // not a "+" or empty space, must be the branch root
+                  vPairs[vPairs.length-1][0] = jj; // modify the first val in last item in vPair to current index (y position)
                   break; // break early
                 }
               }
@@ -227,16 +229,19 @@ const Tree = ({changeState, zoom, oldZoom, currInfo, altInfo, currWeapon, collap
           vPairs.forEach( (vPair, ind) => {
             let colFirstItem = vPair[0];
             let colLastItem = vPair[1];
+            let startX = (paddingX+boxWidth+hLineLength/2)+boxSpaceX*x;
+            let startY = (paddingY+boxWidth/2)+boxSpaceY*colFirstItem;
+            let stopY  = (startY + (colLastItem-colFirstItem)*boxWidth + (colLastItem-colFirstItem)*vLineLength);
             theTree.push(
-              <rect id={`col-${x}-line-${ind+1}`} 
-                    class="v-line" 
-                    width="2"
-                    height={(colLastItem-colFirstItem)*boxWidth + (colLastItem-colFirstItem)*vLineLength}
-                    x={(paddingX+boxWidth+hLineLength/2)+boxSpaceX*x}
-                    y={(paddingY+boxWidth/2)+boxSpaceY*colFirstItem} 
+              <line id={`col-${x}-line-${ind+1}`} 
+                    className="v-line"
+                    x1={startX}
+                    x2={startX}
+                    y1={startY}
+                    y2={stopY} 
                     stroke="black" 
-                    fill="black">
-              </rect>);
+                    strokeWidth="2"
+              />);
           });
         }
       }
@@ -250,7 +255,7 @@ const Tree = ({changeState, zoom, oldZoom, currInfo, altInfo, currWeapon, collap
         // border
         theTree.push(
           <rect id={`border-${itemMod}`} 
-                class="icon-border"
+                className="icon-border"
                 data-weapon={`${cell}`}
                 width={boxWidth}
                 height={boxWidth}
@@ -266,7 +271,7 @@ const Tree = ({changeState, zoom, oldZoom, currInfo, altInfo, currWeapon, collap
         // weapon icon
         theTree.push(
           <image id={`${cell.includes(`(${altAbbr})`)?altAbbr:curAbbr}icon-${itemMod}`}
-                  class="main-icon"
+                  className="main-icon"
                   data-weapon={`${cell}`}
                   href={cell.includes(`(${altAbbr})`)?`./ico/${altAbbr}.png`:
                                                       `./ico/${curAbbr}.png`}
@@ -278,7 +283,6 @@ const Tree = ({changeState, zoom, oldZoom, currInfo, altInfo, currWeapon, collap
                   onTouchCancel={touchHandler}
                   onTouchEnd={touchHandler}
                   onMouseDown={clickHandler}
-                  onClick={clickHandler}
                   onMouseOver={hoverHandler}
                   onMouseLeave={exitHandler}/>
         );
@@ -286,7 +290,7 @@ const Tree = ({changeState, zoom, oldZoom, currInfo, altInfo, currWeapon, collap
         if ( weapon !== undefined && weapon.element !== "N/A" ) {
           theTree.push(
             <image id={`attr1-${itemMod}`}
-                    class="icon"
+                    className="icon"
                     data-weapon={`${cell}`}
                     href={`./ico/${weapon.element.split(" ")[0].toLowerCase()}.png`}
                     x={paddingX + (3*boxWidth/4) + boxSpaceX*x}
@@ -297,7 +301,7 @@ const Tree = ({changeState, zoom, oldZoom, currInfo, altInfo, currWeapon, collap
           if( weapon.element.includes(' / ') ) { // for double element dual blades
             theTree.push(
               <image id={`attr2-${itemMod}`}
-                      class="icon"
+                      className="icon"
                       data-weapon={`${cell}`}
                       href={`./ico/${weapon.element.split(" / ")[1].split(' ')[0].toLowerCase()}.png`}
                       x={paddingX + (3*boxWidth/4) + boxSpaceX*x - 3*boxWidth/8}
@@ -311,7 +315,7 @@ const Tree = ({changeState, zoom, oldZoom, currInfo, altInfo, currWeapon, collap
         if ( weapon !== undefined && weapon["create-cost"] !== "N/A" && x !== 0) {
           theTree.push(
             <image id={`create-${itemMod}`}
-                    class="icon"
+                    className="icon"
                     data-weapon={`${cell}`}
                     href={`./ico/create.png`}
                     x={paddingX - (5*boxWidth/8) + boxSpaceX*x}
@@ -321,12 +325,16 @@ const Tree = ({changeState, zoom, oldZoom, currInfo, altInfo, currWeapon, collap
           );
         }
       }
-    });
-  });
+    }
+  }
   // set the height and width of the svg element based on lowest and right-most elements
 
 
   return <svg width={rightMax + 2*boxWidth} height={bottomMax + 2*boxWidth} id="the-tree">{theTree}</svg>
-}
+}, (oldProps, newProps) => {
+  if ( oldProps.currInfo.abbr !== newProps.currInfo.abbr ) return false;
+  else if ( oldProps.zoom !== newProps.zoom ) return false;
+  return true;
+})
 
 export default Tree;

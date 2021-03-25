@@ -24,9 +24,7 @@ app.use(function (req, res, next){
 
 // public folder
 app.use('/', express.static(process.cwd() + '/dist'));
-
-// icons folder
-app.use('/ico', express.static(process.cwd() + '/ico'));
+app.use('/dist/', express.static(process.cwd() + '/dist'));
 
 // index page
 app.route('/')

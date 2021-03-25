@@ -1,6 +1,6 @@
 {
   "name": "mhfu-weapon-trees",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "description": "KPWorthi personal project, MHFU Weapon Tree Display",
   "repository": "https://www.github.com/kpworthi/mhfu-weapon-tree",
   "main": "server.js",

@@ -1,6 +1,6 @@
 @media (min-width: 768px) and (max-width: 991px) {
   #zoomInBtn { right: calc(33% + 130px)!important; }
-  #zoomOutBtn { right: calc(33% + 88px)!important; }
+  #zoomOutBtn, #filterBtn { right: calc(33% + 88px)!important; }
   #modeBtn { right: calc(33% + 30px)!important; }
 }
 @media (max-width: 400px) {
@@ -22,11 +22,8 @@
   #info-panel{
     height: calc((100vh - 150px) / 3)!important;
   }
-  #sub-dropdown, #app-dropdown {
-    min-width: 90vw!important;
-  }
   #zoomInBtn { right: 130px!important; }
-  #zoomOutBtn { right: 88px!important; }
+  #zoomOutBtn, #filterBtn { right: 88px!important; }
   #modeBtn { right: 30px!important; }
 }
 @media (min-width: 401px) and (max-width: 767px) {
@@ -49,7 +46,7 @@
     height: calc((100vh - 150px) / 3)!important;
   }
   #zoomInBtn { right: 130px!important; }
-  #zoomOutBtn { right: 88px!important; }
+  #zoomOutBtn, #filterBtn { right: 88px!important; }
   #modeBtn { right: 30px!important; }
 }
 
@@ -104,6 +101,14 @@ body {
 
 #sub-dropdown {
   min-width: 405px;
+}
+@media (max-width: 400px) {
+  #sub-dropdown, #app-dropdown {
+    min-width: 90vw!important;
+  }
+}
+@media (min-width: 401px) and (max-width: 767px) {
+  #sub-dropdown{ min-width: 360px; }
 }
 
 .dropdown-curr { 
@@ -219,7 +224,7 @@ body {
 
 /* Tree Definitions */
 
-#zoomInBtn, #zoomOutBtn, #modeBtn {
+#zoomInBtn, #zoomOutBtn {
   user-select: none;
   position: absolute;
   z-index: 1;
@@ -233,7 +238,7 @@ body {
   height: 32px;
 }
 
-#modeBtn {
+#modeBtn, #filterBtn {
   user-select: none;
   position: absolute;
   z-index: 1;
@@ -248,7 +253,7 @@ body {
 }
 
 #zoomInBtn { right: calc(25% + 130px); }
-#zoomOutBtn { right: calc(25% + 88px); }  
+#zoomOutBtn, #filterBtn { right: calc(25% + 88px); }
 #modeBtn { right: calc(25% + 30px); }  
 
 .icon-border {
@@ -362,6 +367,7 @@ body {
 /* Sharpness Classes */
 
 .sharp-container {
+  pointer-events: none;
   min-width: max-content;
 }
 
@@ -392,7 +398,7 @@ body {
 
 .sh-dbl { border-left: 0px!important; }
 
-#temp-wrapper { padding: 0 15px;}
+#app-wrapper { padding: 0 15px;}
 .starter-nav {
   margin: 0;
   display: flex;

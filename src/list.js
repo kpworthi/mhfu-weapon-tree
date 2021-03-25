@@ -1,37 +1,36 @@
 import React from 'react';
 
-const List = React.memo(({changeState, sortParam, sortOrder, currData, subTitle, currentStats, buildSharpness, buildCoatings}) => {
-
+const List = React.memo(({ changeState, sortParam, sortOrder, filters, currInfo, currentStats, buildSharpness, buildCoatings }) => {
   const clickHandler = ( event ) => {
+    // handle click on list tree link
+    if ( event.target.nodeName == "SPAN" && event.target.textContent ) {
+      event.stopPropagation();
+      btnListTreeLink( event.target.parentElement.parentElement.dataset.weapon );
+    }
     // handle click on list table headers
-    if ( event.currentTarget.id === "list-header-row" ) {
+    else if ( event.target.matches("td.list-header")  ) {
       btnListTableHeader( event.target.textContent )
     }
     // handle click on list item (not tree link)
-    else if ( event.currentTarget.id.endsWith('row') ) {
+    else if ( event.target.nodeName === 'TD' ) {
       changeState({
-        itemSelect: currData.data.find(weapon => weapon.name===event.currentTarget.dataset.weapon)
+        itemSelect: currInfo.data.find(weapon => weapon.name===event.target.parentElement.dataset.weapon)
       });
-    }
-    // handle click on list tree link
-    else if ( event.currentTarget.id.endsWith("tree-link") && event.currentTarget.textContent ) {
-      event.stopPropagation();
-      btnListTreeLink( event.currentTarget.parentElement.dataset.weapon );
     }
   }
 
   const btnListTableHeader = ( textContent ) => {
-    // let's not sort by sharpness just yet
+    // let's not sort by sharpness, coatings, or shot types just yet
     if ( !['Sharpness', 'Tree Link', 'Coatings', 'Shots', ''].includes(textContent) ) {
       let newSortKey = '';
       if ( textContent === 'Defense Bonus' ) newSortKey = 'bonus'; // convert 'defense' header to 'bonus'
       else if ( textContent.length > 10 ) return null; // managed to click on empty area of the row or something
       else newSortKey = textContent.toLowerCase()
       
-      if ( newSortKey == sortParam ){
+      if ( newSortKey == sortParam ){ // swap ascending and descending orders
         changeState({listSortOrder: sortOrder==='asc'?'dec':'asc'})
       }
-      else {
+      else { // assign new sort order
         document.querySelectorAll('.list-header').forEach( el => {
           let elText = el.textContent.toLowerCase();
           el.classList.remove('header-bold');
@@ -43,27 +42,23 @@ const List = React.memo(({changeState, sortParam, sortOrder, currData, subTitle,
   }
 
   const btnListTreeLink = ( clickedWeapon ) => {
-    let scrollTo = ( newBorder ) => {
-      let newScrollHeight = Math.floor(newBorder.y.baseVal.value)-document.querySelector('#svg-overflow-wrapper').offsetHeight/2;
-      document.querySelector('#svg-overflow-wrapper').scrollTop = newScrollHeight;
-      let newScrollWidth = Math.floor(newBorder.x.baseVal.value)-document.querySelector('#svg-overflow-wrapper').offsetWidth/2;
-      document.querySelector('#svg-overflow-wrapper').scrollLeft = newScrollWidth;
-    }
 
     changeState({
-      itemSelect: currData.data.find(weapon => weapon.name === clickedWeapon),
+      itemSelect: currInfo.data.find(weapon => weapon.name === clickedWeapon),
       mode: 'tree'
     }, () => {
       let newBorder = Array.from(document.querySelectorAll('.icon-border')).find( ele => ele.dataset.weapon === clickedWeapon );
       if ( !newBorder ) { // weapon is likely in a collapsed tree, collapse trees, reassign new border, then proceed
         changeState( {collapsedTrees: []}, () => {
           newBorder = Array.from(document.querySelectorAll('.icon-border')).find( ele => ele.dataset.weapon === clickedWeapon );
-          scrollTo(newBorder);
         })
       }
-      else { // weapon is likely not in a collapsed tree. proceed normally
-        scrollTo(newBorder);
-      }
+
+      // once the new border is found correctly, scroll to it
+      let newScrollHeight = Math.floor(newBorder.y.baseVal.value)-document.querySelector('#svg-overflow-wrapper').offsetHeight/2;
+      document.querySelector('#svg-overflow-wrapper').scrollTop = newScrollHeight;
+      let newScrollWidth = Math.floor(newBorder.x.baseVal.value)-document.querySelector('#svg-overflow-wrapper').offsetWidth/2;
+      document.querySelector('#svg-overflow-wrapper').scrollLeft = newScrollWidth;
     });
   }
 
@@ -85,7 +80,7 @@ const List = React.memo(({changeState, sortParam, sortOrder, currData, subTitle,
     return shotString;
   }
 
-  let theList = currData.data.sort((a,b) => {
+  const theList = currInfo.data.sort((a,b) => {
     let valueA = 0;
     let valueB = 0;
     if ( sortOrder === "asc"){
@@ -96,6 +91,7 @@ const List = React.memo(({changeState, sortParam, sortOrder, currData, subTitle,
       valueB = a[sortParam].toLowerCase();
     }
 
+    // sort most by a numeric value, and element by the element name
     if ( sortParam == "attack" || sortParam == "rarity") {
       valueA = Number(valueA);
       valueB = Number(valueB);
@@ -115,60 +111,70 @@ const List = React.memo(({changeState, sortParam, sortOrder, currData, subTitle,
     return 0;
   })
 
-  console.log('list re-render');
+  // map jsx to the headers and rows
+  const listHeaderJSX = currentStats.map( stat => {
+    let title = stat.split('');
+    title[0] = title[0].toUpperCase();
+    title = title.join('');
+    return <td className="list-header" key={stat}>{title=="Bonus"?"Defense Bonus":title}</td>} 
+  );
+
+  let listRowsJSX = []; 
+  for ( let i = 0; i<theList.length; i++) {
+    const weapon = theList[i];
+    let statsArray = [];
+    statsArray.push(<td id={`${weapon.name.toLowerCase()}-name`} className="list-cell pr-2" >{weapon.name}</td>)
+    for (let j = 0; j<currentStats.length; j++ ){
+      const key = currentStats[j]
+      statsArray.push(
+        <td id={`${weapon.name.toLowerCase()}-${key}`} key={`${weapon.name}-${key}`} className="list-cell pr-2">
+          {key==="sharpness"?buildSharpness( weapon.sharpness ):
+          key==="notes"?buildNotesPreview( weapon.notes ):
+          key==="coatings"?buildCoatings( weapon.coatings ):
+          key==="shots"?buildShotsPreview( weapon.shots ):
+          weapon[key]}
+        </td>
+      )
+    }
+    statsArray.push(
+      <td id={`${weapon.name.toLowerCase()}-tree-link`} 
+          className="list-cell text-center">
+        {weapon.name.endsWith("G")||(weapon["upgrade-to"]==="N/A"&&weapon["upgrade-from"]==="N/A")?null:<span>O</span>}
+      </td>
+    )
+
+    listRowsJSX.push(
+      <tr id={`${weapon.name.toLowerCase()}-row`} 
+          key={`${weapon.name.toLowerCase()}-row-key`}
+          className="list-row"
+          data-weapon={weapon.name}>
+        { statsArray }
+      </tr>
+    )
+  }
 
   return (
     <div id="list-container" className="col-md-8 col-lg-9">
-      <table id="weapon-list">
+      <table id="weapon-list" onMouseDown={clickHandler}>
         <thead>
-          <tr id="list-header-row" onClick={clickHandler}>
+          <tr id="list-header-row">
             <td className="list-header header-bold">Name</td>
-            {currentStats.map( stat => {
-              let title = stat.split('');
-              title[0] = title[0].toUpperCase();
-              title = title.join('');
-              return <td className="list-header" key={stat}>{title=="Bonus"?"Defense Bonus":title}</td>} 
-            )}
+            { listHeaderJSX }
             <td className="list-header">Tree Link</td>
           </tr>
         </thead>
         <tbody>
-          {theList.map( weapon =>{
-            return (
-              <tr id={`${weapon.name.toLowerCase()}-row`} 
-                  key={`${weapon.name.toLowerCase()}-row-key`}
-                  className="list-row"
-                  data-weapon={weapon.name}
-                  onClick={clickHandler}>
-                <td id={`${weapon.name.toLowerCase()}-name`} className="list-cell pr-2" >{weapon.name}</td>
-                {currentStats.map( key => {
-                  return (
-                    <td id={`${weapon.name.toLowerCase()}-${key}`} key={`${weapon.name}-${key}`} className="list-cell pr-2">
-                      {key=="sharpness"?buildSharpness(weapon.sharpness):
-                       key==="notes"?buildNotesPreview(weapon.notes):
-                       key==="coatings"?buildCoatings( weapon.coatings ):
-                       key==="shots"?buildShotsPreview( weapon.shots ):
-                       weapon[key]}
-                    </td>
-                  )
-                })}
-                <td id={`${weapon.name.toLowerCase()}-tree-link`} 
-                    className="list-cell text-center" 
-                    onClick={clickHandler}>
-                      {weapon.name.endsWith("G")||(weapon["upgrade-to"]==="N/A"&&weapon["upgrade-from"]==="N/A")?null:<span>O</span>}
-                </td>
-              </tr>
-            )
-          })}
+          { listRowsJSX }
         </tbody>
       </table>
     </div>
   )
 }, ( oldProps, newProps) => {
-  if ( oldProps.subTitle === newProps.subTitle ) return true;
-  else if ( oldProps.sortParam === newProps.sortParam ) return true;
-  else if ( oldProps.sortOrder === newProps.sortOrder ) return true;
-  return false;
-})
+  // update list component on new weapon type or new sort order
+  if ( oldProps.currInfo.abbr !== newProps.currInfo.abbr ) return false;
+  else if ( oldProps.sortParam !== newProps.sortParam ) return false;
+  else if ( oldProps.sortOrder !== newProps.sortOrder ) return false;
+  return true;
+});
 
 export default List;
