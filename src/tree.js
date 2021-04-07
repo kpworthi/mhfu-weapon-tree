@@ -334,6 +334,7 @@ const Tree = React.memo(({changeState, zoom, oldZoom, currInfo, altInfo, currWea
 }, (oldProps, newProps) => {
   if ( oldProps.currInfo.abbr !== newProps.currInfo.abbr ) return false;
   else if ( oldProps.zoom !== newProps.zoom ) return false;
+  else if ( oldProps.collapsedTrees !== newProps.collapsedTrees ) return false;
   return true;
 })
 
