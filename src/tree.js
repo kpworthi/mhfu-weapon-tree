@@ -192,34 +192,23 @@ const Tree = React.memo(({changeState, zoom, oldZoom, currInfo, altInfo, currWea
       // is reached for that item
       if ( y === 0 ) {
         let vPairs = []; // array for all the start/end points for each vertical line
-        let column = []; // array for the current column
-        newGrid.forEach( rowAgain => column.push(rowAgain[x]) )
+        const column = newGrid.map((row) => row[x]); // array for the current column
         if ( column.indexOf("+") !== -1 ) { // make sure there's a "+"
           for (let k=0; k<column.length; k++) { // iterate over each column item
             const cell = column[k];
             if (cell === "+") { // check to see if the current "+" is the last branch or not, then set it
               let cellsLeft = column.slice(0,k);
               let cellsRight = column.slice(k+1);
-              let continueFlag = false;
-              if ( k === column.length-1 ) vPairs.push([0,k]); // if it's the last "+" in a column, set it
-              else {
-                let rightCell = '';
-                for ( let ii=0; ii<cellsRight.length; ii++ ) { // iterate over every item to the right of the current cell
-                  if ( cellsRight[ii] === "+" ) {
-                    continueFlag = true; // if it's another "+", it's not the last branch, check next item in column
-                    break;
-                  }
-                  else if ( cellsRight[ii] !== "" ) {
-                    vPairs.push([0,k]); // add the y-position of "+" to the vPair array
-                    break; // break early if it wasn't the end of the column
-                  }
-                }
+              const rightCell = cellsRight.find((cell) => cell !== "");
+
+              if (rightCell === "+") {
+                // stop checking this column item if it was determined not to be the last branch
+                continue;
               }
-              if ( continueFlag ) continue; // stop checking this column item if it was determined not the last branch
 
               for ( let jj=k-1; jj >= 0; jj-- ) { // iterate over every item to the left of the current cell
                 if ( cellsLeft[jj] !== "+" && cellsLeft[jj] !== "" ) { // not a "+" or empty space, must be the branch root
-                  vPairs[vPairs.length-1][0] = jj; // modify the first val in last item in vPair to current index (y position)
+                  vPairs.push([jj, k]);
                   break; // break early
                 }
               }
